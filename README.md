@@ -1,4 +1,7 @@
-# html-disable-cache
+# html-disable-cache   
+
+[[English document]](./en/README.md)
+
 ![npm version](https://img.shields.io/badge/npm-0.1.2-brightgreen.svg)
 
 这是一个处理html浏览器缓存的工具；不管你的页面跑在那个webview中，都会面临着缓存的考验，让你的网页不能实时根据你更新的内容来显示；这个工具就是再各种浏览器缓存折么中诞生的；
