@@ -1,6 +1,6 @@
 {
   "name": "html-disable-cache",
-  "version": "1.0.0",
+  "version": "0.1.2",
   "description": "this is a tool",
   "main": "index.js",
   "scripts": {
