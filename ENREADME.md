@@ -1,6 +1,6 @@
 # html-disable-cache 
 
-[[中文文档]](../README.md)
+[[中文文档]](./README.md)
 
 ![npm version](https://img.shields.io/badge/npm-0.1.2-brightgreen.svg)
 
