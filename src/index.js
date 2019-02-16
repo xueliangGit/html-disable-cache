@@ -179,7 +179,6 @@ function getUgJs(str){
   //恢复 特殊字符
 }
 module.exports=function(...arry){
-  console.log(...arry)
   try{
     new HDC(...arry)
   }catch(e){
