@@ -2,7 +2,9 @@
 
 [[中文文档]](./README.md)
 
-![npm version](https://img.shields.io/badge/npm-0.1.6-brightgreen.svg)
+![npm version](https://img.shields.io/badge/npm-0.1.6-brightgreen.svg) 
+
+![HDC](./assets/hdc.jpg)
 
 HDC (html-disable-cache) is a solution for your HTML browser cache. It solves the problem of browser cache for you and lets your application change with you.
 

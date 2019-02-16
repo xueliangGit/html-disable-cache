@@ -3,6 +3,9 @@
 [[English document]](./ENREADME.md)
 
 ![npm version](https://img.shields.io/badge/npm-0.1.6-brightgreen.svg)
+
+![HDC](./assets/hdc.jpg)
+
 ####
 HDC(html-disable-cache)你的html浏览器缓存的一个处理方案，为你解决浏览器的缓存的问题，让你的应用随你而变.
 
