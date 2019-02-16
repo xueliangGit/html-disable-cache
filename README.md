@@ -1,16 +1,55 @@
-# html-disable-cache   
+# html-disable-cache   [HDC]
 
 [[English document]](./ENREADME.md)
 
-![npm version](https://img.shields.io/badge/npm-0.1.3-brightgreen.svg)
+![npm version](https://img.shields.io/badge/npm-0.1.5-brightgreen.svg)
+####
+这是一个处理html浏览器缓存的工具；不管你的页面跑在那个webview中，都会面临着缓存的考验，
+让你的网页不能实时根据你更新的内容来显示；这个工具就是再各种浏览器缓存折么中诞生的；
 
-这是一个处理html浏览器缓存的工具；不管你的页面跑在那个webview中，都会面临着缓存的考验，让你的网页不能实时根据你更新的内容来显示；这个工具就是再各种浏览器缓存折么中诞生的；
+---
+`已经集成了Cli，方便在非框架搭建的项目中使用`
 
-----
+---
 ## 该工具用法：
+>该工具已集成Cli命令
 
-`npm i html-disable-cache -D`
+ `HDC url [path]` path 是 html文件夹的目录，不传时默认是当前路径
+
+
+ `HDC config [path]` path 是 HDC 的配置文件路径 不传时 将在当前目录下查找 `HDC.config.js` 文件进行读取。
+
+HDC配置文件如下
 ````js
+const path = require('path')
+module.exports={
+  distPath:path.join(__dirname,'./dist'),
+  floderName:'mine'// js放在目录的名字 默认是 HDC
+}
+````
+>使用Cli方法
+
+
+全局安装 `html-disable-cache` 
+
+````
+npm i html-disable-cache -g
+````
+ 
+
+1、 在 `html` 目录下运行 `HDC url` 命令即可 
+
+2、 在项目目录添加`HDC`配置文件，见上面的文件信息；直接在目录下运行 `HDC config` 命令
+
+>不使用Cli命令，要集成到当前项目
+
+先安装依赖
+````
+npm i html-disable-cache -D
+````
+添加 `HDC.js` 文件
+````js
+// HDC.js
 // 用法
 let HDC =require('html-disable-cache')
 HDC('你的html目录的绝对路径 ');
@@ -21,7 +60,10 @@ let HDC =require('html-disable-cache')
 let path = require('path')
 HDC(path.join(__dirname,'./dist'));
 ````
-
+运行 node命令可以
+````
+node HDC.js
+````
 ><br>本工具主要用的思想是：<br><br>
 加载静态资源时，
 例如js，css；若是地址不变，浏览器短时间内只会再第一次加载页面时区请求服务器上的文件，之后的时候会默认从缓存中获取，这是为了加快网页的访问；当地址改变时才会去调用服务器上的资源；<BR>
