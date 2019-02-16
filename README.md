@@ -2,9 +2,9 @@
 
 [[English document]](./ENREADME.md)
 
-![npm version](https://img.shields.io/badge/npm-0.1.6-brightgreen.svg)
+![HDC version](https://img.shields.io/badge/HDC-0.1.7-brightgreen.svg)
 
-![HDC](./assets/hdc.jpg)
+![HDC](./assets/hdc.jpg  "HDC")
 
 ####
 HDC(html-disable-cache)你的html浏览器缓存的一个处理方案，为你解决浏览器的缓存的问题，让你的应用随你而变.
@@ -69,6 +69,12 @@ HDC(path.join(__dirname,'./dist'));
 ````
 node HDC.js
 ````
+
+---
+0.1.7@HDC 2019-2-17  更新
+
+1、调整加载js；使js加载完毕后恢复大致原来的位置；例如在head中的；加载完后在head中；在有id的div中的加载完后还在div中，其它请况全在body中；让html开发人员在找js位置时不会一头雾水。
+
 ><br>本工具主要用的思想是：<br><br>
 加载静态资源时，
 例如js，css；若是地址不变，浏览器短时间内只会再第一次加载页面时区请求服务器上的文件，之后的时候会默认从缓存中获取，这是为了加快网页的访问；当地址改变时才会去调用服务器上的资源；<BR>

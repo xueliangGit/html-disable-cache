@@ -2,7 +2,7 @@
 
 [[中文文档]](./README.md)
 
-![npm version](https://img.shields.io/badge/npm-0.1.6-brightgreen.svg) 
+![HDC version](https://img.shields.io/badge/HDC-0.1.7-brightgreen.svg) 
 
 ![HDC](./assets/hdc.jpg)
 

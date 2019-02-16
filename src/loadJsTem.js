@@ -44,7 +44,7 @@
         }
       }
     }
-    document.getElementsByTagName('head')[0].appendChild(obj)
+    putToHtml(cssObj,obj)
   }
   function laodScript(obj, callback, version) {
     var done = false
@@ -63,7 +63,16 @@
         }
       }
     }
-    document.getElementsByTagName('head')[0].appendChild(script)
+    putToHtml(obj,script)
+  }
+  function putToHtml(obj,scriptObj){
+    if(obj.id){
+      document.getElementById(obj.id).appendChild(scriptObj)
+    }else if(obj.position){
+      document.getElementsByTagName(obj.position)[0].appendChild(scriptObj)
+    }else{
+      document.getElementsByTagName('head')[0].appendChild(scriptObj)
+    }
   }
   loadFn('replaceUrl', Math.random())
   window.__loadFn = loadFn

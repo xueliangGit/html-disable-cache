@@ -63,12 +63,24 @@ function doHtml(html,htmlUrl,baseName,htmlIndex){
   // 处理js
   let needLoadJs=[]
   scripts.each(function(i,v){
-    needLoadJs.push({url:v.attribs.src,type:'js'})
+    let position = 'head'
+    let id = ''
+    if(v.parent.name=='head'){
+      position = 'head'
+    }else if(v.parent.name=='body'){
+      position = 'body'
+    }else if(v.parent.attribs.id){
+      position =''
+      id=v.parent.attribs.id
+    }else{
+      position = 'body'
+    }
+    needLoadJs.push({url:v.attribs.src,type:'js',position,id})
   })
   //处理 style
   let styls=$('link[rel="stylesheet"]')
   styls.each(function(i,v){
-    needLoadJs.push({url:v.attribs.href,type:'css'})
+    needLoadJs.push({url:v.attribs.href,type:'css',position:'head',id:''})
   })
   styls.remove()
   let baseNameUrl=path.normalize(baseName,'/').replace(this.conf.distPath,'').split(path.sep).join('_')
@@ -118,7 +130,6 @@ function _wJs(jsPath,data){
   });
 }
 function writeHtml (filePath,data) {
-  console.log(filePath)
   fs.writeFile(filePath,data, (err)=>{
     if(err) throw err;
     if(this.conf.show){

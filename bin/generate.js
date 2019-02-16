@@ -5,6 +5,8 @@ const chalk = require('chalk')
 const HDC =require('../src/index')
 const path = require('path')
 const fs = require('fs-extra')
+const strBy = ['当你遇到难点的时候，你应该庆幸，你又要提高了！','喜欢折腾就开始造吧！','开拓你的思维，没有什么技术难点，只是没有想到而已！','技能是靠经验打磨出来的！','前端发展很快，一不留神就会跟不上的；所以请不断学习']
+
 /**
  * Usage.
  */
@@ -37,7 +39,10 @@ program
 
 program.parse(process.argv);
 function make_red(txt){
-  return chalk.magentaBright(' \n',txt,' \n',chalk.gray('喜欢折腾就开始造吧。--by 无声'),' \n')
+  return chalk.magentaBright(' \n',txt,' \n',getStr())
+}
+function getStr(){
+  return chalk.gray(' \n',strBy[parseInt(Math.random()*strBy.length)],'  --by 无声',' \n')
 }
 function doUrl(type,paths,floderName){
   let bspath = process.cwd();
