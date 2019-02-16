@@ -1,8 +1,10 @@
-# html-disable-cache 
+# html-disable-cache [HDC]
 
 [[中文文档]](./README.md)
 
 ![npm version](https://img.shields.io/badge/npm-0.1.6-brightgreen.svg)
+
+HDC (html-disable-cache) is a solution for your HTML browser cache. It solves the problem of browser cache for you and lets your application change with you.
 
 This is a tool to handle HTML browser caching; no matter where your page runs in the web view, it will face the test of caching, so that your web page can not be displayed in real time according to the content you updated; this tool was born in a variety of browser caching compromise;
 

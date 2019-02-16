@@ -4,6 +4,8 @@
 
 ![npm version](https://img.shields.io/badge/npm-0.1.6-brightgreen.svg)
 ####
+HDC(html-disable-cache)你的html浏览器缓存的一个处理方案，为你解决浏览器的缓存的问题，让你的应用随你而变.
+
 这是一个处理html浏览器缓存的工具；不管你的页面跑在那个webview中，都会面临着缓存的考验，
 让你的网页不能实时根据你更新的内容来显示；这个工具就是再各种浏览器缓存折么中诞生的；
 
@@ -45,7 +47,7 @@ npm i html-disable-cache -g
 
 先安装依赖
 ````
-npm i html-disable-cache -D
+npm i html-disable-cache -S
 ````
 添加 `HDC.js` 文件
 ````js
