@@ -34,7 +34,7 @@
     var obj = document.createElement('link')
     obj.setAttribute('rel', 'stylesheet')
     obj.setAttribute('type', 'text/css')
-    obj.setAttribute('href', cssObj.url + '?disCache=' + version)
+    obj.setAttribute('href', cssObj.url + '?HDC=' + version)
     obj.onload = obj.onreadystatechange = function () {
       if (!done && (!obj.readyState || obj.readyState == 'loaded' || obj.readyState == 'compvare')) {
         done = true
@@ -52,7 +52,7 @@
     script.type = 'text/javascript'
     script.language = 'javascript'
     script.charset = 'utf-8'
-    script.src = obj.url + '?disCache=' + version
+    script.src = obj.url + '?HDC=' + version
     // script.setAttribute('src', url);
     script.onload = script.onreadystatechange = function () {
       if (!done && (!script.readyState || script.readyState == 'loaded' || script.readyState == 'compvare')) {

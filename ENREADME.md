@@ -2,7 +2,7 @@
 
 [[中文文档]](./README.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.1.7-brightgreen.svg) 
+![HDC version](https://img.shields.io/badge/HDC-0.1.8-brightgreen.svg) 
 
 ![HDC](./assets/hdc.jpg)
 
@@ -27,7 +27,9 @@ The HDC configuration file is as follows
 const path = require('path')
 module.exports={
   distPath:path.join(__dirname,'./dist'),
-  floderName:'mine'// The name of JS in the directory defaults to HDC
+  floderName:'mine',// The name of JS in the directory defaults to HDC
+  ignoreAttr:'hdc-ignore', //Js that do not require hdc processing default to hdc-ignore.
+  removeIgnoreAttr:true // Whether to remove the identification after the program ends is true by default
 }
 ````
 >Using Cli method
@@ -53,7 +55,14 @@ Add `HDC.js` file
 // way
 let HDC =require('html-disable-cache')
 HDC('Absolute path to your HTML directory ');
-
+/* or
+HDC({
+  distPath:path.join(__dirname,'./dist'),
+  floderName:'mine',// js放在目录的名字 默认是 HDC
+  ignoreAttr:'hdc-ignore', //不需要hdc 处理的 js 默认是 hdc-ignore
+  removeIgnoreAttr:true // 是否在程序结束后 移除标识  默认是true
+})
+*/
 // case
 
 let HDC =require('html-disable-cache')

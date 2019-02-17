@@ -2,7 +2,7 @@
 
 [[English document]](./ENREADME.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.1.7-brightgreen.svg)
+![HDC version](https://img.shields.io/badge/HDC-0.1.8-brightgreen.svg)
 
 ![HDC](./assets/hdc.jpg  "HDC")
 
@@ -29,7 +29,9 @@ HDC配置文件如下
 const path = require('path')
 module.exports={
   distPath:path.join(__dirname,'./dist'),
-  floderName:'mine'// js放在目录的名字 默认是 HDC
+  floderName:'mine',// js放在目录的名字 默认是 HDC
+  ignoreAttr:'hdc-ignore', //不需要hdc 处理的 js 默认是 hdc-ignore
+  removeIgnoreAttr:true // 是否在程序结束后 移除标识  默认是true
 }
 ````
 >使用Cli方法
@@ -58,7 +60,14 @@ npm i html-disable-cache -S
 // 用法
 let HDC =require('html-disable-cache')
 HDC('你的html目录的绝对路径 ');
-
+/* or
+HDC({
+  distPath:path.join(__dirname,'./dist'),
+  floderName:'mine',// js放在目录的名字 默认是 HDC
+  ignoreAttr:'hdc-ignore', //不需要hdc 处理的 js 默认是 hdc-ignore
+  removeIgnoreAttr:true // 是否在程序结束后 移除标识  默认是true
+})
+*/
 // 例如
 
 let HDC =require('html-disable-cache')

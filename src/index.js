@@ -19,20 +19,23 @@ let log_=chalk.blueBright('Html-disable-cache:\n    ')
  * }
  * */
 function HDC(distResolvePath,config={}){
-  this.conf = {
+  let initConf = { 
     htmlNum:0,
     staticNum:0,
-    isDid:0,
+    isDid:0}
+  this.conf = {
     show:false,
     distPath:'',
-    floderName:'HDC'
+    floderName:'HDC',
+    removeIgnoreAttr:true,
+    ignoreAttr:'hdc-ignore' // 排除处理的js或者css
   }
   if(typeof distResolvePath === 'string'){
     this.conf.distPath=distResolvePath
   }else if(typeof distResolvePath === 'object'){
-    Object.assign(this.conf,distResolvePath)
+    Object.assign(this.conf,distResolvePath,initConf)
   }
-  Object.assign(this.conf,config)
+  Object.assign(this.conf,config,initConf)
   if (!fs.pathExistsSync(this.conf.distPath)) {
     console.log(log_,chalk.yellow('需要保证 '+this.conf.distPath+'目录存在'))
     process.exit(0)
@@ -59,7 +62,8 @@ function disCache(obj){
 //-------- 处理html文件
 function doHtml(html,htmlUrl,baseName,htmlIndex){
   let $ = cheerio.load(html); // 加载一个 html 文本
-  let scripts=$('script[src]')
+  let scripts=$(`script[src]:not([${this.conf.ignoreAttr}])`)
+  
   // 处理js
   let needLoadJs=[]
   scripts.each(function(i,v){
@@ -77,12 +81,18 @@ function doHtml(html,htmlUrl,baseName,htmlIndex){
     }
     needLoadJs.push({url:v.attribs.src,type:'js',position,id})
   })
+  scripts.remove()
   //处理 style
-  let styls=$('link[rel="stylesheet"]')
+  let styls=$(`link[rel="stylesheet"]:not([${this.conf.ignoreAttr}])`)
   styls.each(function(i,v){
     needLoadJs.push({url:v.attribs.href,type:'css',position:'head',id:''})
   })
   styls.remove()
+  if(this.conf.removeIgnoreAttr){
+    $(`script[${this.conf.ignoreAttr}]`).removeAttr(this.conf.ignoreAttr);
+    $(`link[rel="stylesheet"][${this.conf.ignoreAttr}]`).removeAttr(this.conf.ignoreAttr);
+    // $(`script[${this.conf.ignoreAttr}]`,`link[rel="stylesheet"][${this.conf.ignoreAttr}]`).removeAttr(this.conf.ignoreAttr)
+  }
   let baseNameUrl=path.normalize(baseName,'/').replace(this.conf.distPath,'').split(path.sep).join('_')
   let jsName = './'+this.conf.floderName+'/'+baseNameUrl+'.js'
   // jsName=path.relative(path.normalize(baseName,'../'),path.join(distPath,jsName))
@@ -94,7 +104,6 @@ function doHtml(html,htmlUrl,baseName,htmlIndex){
     ${jsStr.replace("replaceUrl",path.relative(path.join(baseName,'../'),path.join(this.conf.distPath,jsName)).split(path.sep).join('/'))}
     </script>
     `)
-    $('script[src]').remove()
     let htmlData=minify($.html(),{removeComments: true,collapseWhitespace: true,minifyJS:true, minifyCSS:true})
     writeHtml.call(this,htmlUrl,htmlData)
     let jsData='__loadFn('+JSON.stringify(needLoadJs)+','+(+new Date())+');'
