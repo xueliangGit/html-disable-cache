@@ -2,9 +2,9 @@
 
 [[English document]](./ENREADME.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.1.8-brightgreen.svg)
+![HDC version](https://img.shields.io/badge/HDC-0.1.9-brightgreen.svg)
 
-![HDC](./assets/hdc.jpg  "HDC")
+![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg  "HDC")
 
 ####
 HDC(html-disable-cache)你的html浏览器缓存的一个处理方案，为你解决浏览器的缓存的问题，让你的应用随你而变.

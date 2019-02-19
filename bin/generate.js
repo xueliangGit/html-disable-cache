@@ -12,7 +12,7 @@ const strBy = ['当你遇到难点的时候，你应该庆幸，你又要提高�
  */
 program
 .command('config [pathUrl]')
-.description('Use of links')
+.description('Use configuration files')
 // .alias('conf')
 .action(function(pathUrl,...other){
   doUrl('config',pathUrl);
@@ -21,7 +21,7 @@ program
 });
 program
 .command('url [pathUrl] [floderName]')
-.description('Use configuration files')
+.description('Use of links')
 // .alias('u')
 .action(function(pathUrl,floderName){
   doUrl('url',pathUrl,floderName);
