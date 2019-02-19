@@ -31,47 +31,39 @@
   }
   function loadStyle(cssObj, callback, version) {
     var done = false
-    var obj = document.createElement('link')
-    obj.setAttribute('rel', 'stylesheet')
-    obj.setAttribute('type', 'text/css')
-    obj.setAttribute('href', cssObj.url + '?HDC=' + version)
-    obj.onload = obj.onreadystatechange = function () {
-      if (!done && (!obj.readyState || obj.readyState == 'loaded' || obj.readyState == 'compvare')) {
-        done = true
-        obj.onload = obj.onreadystatechange = null
-        if (callback) {
-          callback(obj)
-        }
-      }
-    }
-    putToHtml(cssObj,obj)
+    var style = document.createElement('link')
+    style.setAttribute('rel', 'stylesheet')
+    style.setAttribute('type', 'text/css')
+    style.setAttribute('href', cssObj.url + '?HDC=' + version)
+    putToHtml(cssObj,style,callback)
   }
-  function laodScript(obj, callback, version) {
-    var done = false
+  function laodScript(jsObj, callback, version) {
     var script = document.createElement('script')
     script.type = 'text/javascript'
     script.language = 'javascript'
     script.charset = 'utf-8'
-    script.src = obj.url + '?HDC=' + version
+    script.src = jsObj.url + '?HDC=' + version
     // script.setAttribute('src', url);
-    script.onload = script.onreadystatechange = function () {
-      if (!done && (!script.readyState || script.readyState == 'loaded' || script.readyState == 'compvare')) {
+   
+    putToHtml(jsObj,script,callback)
+  }
+  function putToHtml(obj,loadItem,callback){
+    var done = false
+    loadItem.onload = loadItem.onreadystatechange = function () {
+      if (!done && (!loadItem.readyState || loadItem.readyState == 'loaded' || loadItem.readyState == 'compvare')) {
         done = true
-        script.onload = script.onreadystatechange = null
+        loadItem.onload = loadItem.onreadystatechange = null
         if (callback) {
-          callback(script)
+          callback(loadItem)
         }
       }
     }
-    putToHtml(obj,script)
-  }
-  function putToHtml(obj,scriptObj){
     if(obj.id){
-      document.getElementById(obj.id).appendChild(scriptObj)
+      document.getElementById(obj.id).appendChild(loadItem)
     }else if(obj.position){
-      document.getElementsByTagName(obj.position)[0].appendChild(scriptObj)
+      document.getElementsByTagName(obj.position)[0].appendChild(loadItem)
     }else{
-      document.getElementsByTagName('head')[0].appendChild(scriptObj)
+      document.getElementsByTagName('head')[0].appendChild(loadItem)
     }
   }
   loadFn('replaceUrl', Math.random())

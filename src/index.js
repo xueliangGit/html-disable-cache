@@ -62,6 +62,10 @@ function disCache(obj){
 //-------- 处理html文件
 function doHtml(html,htmlUrl,baseName,htmlIndex){
   let $ = cheerio.load(html); // 加载一个 html 文本
+  if($('[hdc-did]').length){
+    console.log(log_,chalk.cyanBright(htmlUrl+':该文件已经被HDC处理了'))
+    return false
+  }
   let scripts=$(`script[src]:not([${this.conf.ignoreAttr}])`)
   
   // 处理js
@@ -100,7 +104,7 @@ function doHtml(html,htmlUrl,baseName,htmlIndex){
   if(needLoadJs.length){
     this.conf.isDid ++
     $('body').append(`
-    <script type='text/javascript' language = 'javascript'>
+    <script type='text/javascript' language = 'javascript' hdc-did>
     ${jsStr.replace("replaceUrl",path.relative(path.join(baseName,'../'),path.join(this.conf.distPath,jsName)).split(path.sep).join('/'))}
     </script>
     `)

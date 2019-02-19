@@ -73,9 +73,13 @@ Run the node command
 ````
 node HDC.js
 ````
-0.1.7@HDC 2019-2-17 Update 
-
-1. Adjust loading js; restore JS to its original position after loading; for example, in head; in head after loading; in div with ID after loading, in body; so that HTML developers will not be confused when looking for JS location.
+> 
+>0.2.0@HDC 2019-2-19 Update
+> 1. Optimizing errors and avoiding duplication of uniform documents;
+> 2. Optimizing loading code <br>
+>
+> 0.1.7@HDC 2019-2-17 Update 
+> 1. Adjust loading js; restore JS to its original position after loading; for example, in head; in head after loading; in div with ID after loading, in body; so that HTML developers will not be confused when looking for JS location.
 
 ><br>The main ideas of this tool are:<br><br>
 When loading static resources,
