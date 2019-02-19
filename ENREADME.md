@@ -2,7 +2,7 @@
 
 [[中文文档]](./README.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.1.9-brightgreen.svg) 
+![HDC version](https://img.shields.io/badge/HDC-0.2.0-brightgreen.svg) 
 
 ![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg "HDC")
 
