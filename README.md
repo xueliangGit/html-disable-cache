@@ -2,8 +2,13 @@
 
 [[English document]](./ENREADME.md)
 
-![npm version](https://img.shields.io/badge/npm-0.1.5-brightgreen.svg)
+![HDC version](https://img.shields.io/badge/HDC-0.2.0-brightgreen.svg)
+
+![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg  "HDC")
+
 ####
+HDC(html-disable-cache)你的html浏览器缓存的一个处理方案，为你解决浏览器的缓存的问题，让你的应用随你而变.
+
 这是一个处理html浏览器缓存的工具；不管你的页面跑在那个webview中，都会面临着缓存的考验，
 让你的网页不能实时根据你更新的内容来显示；这个工具就是再各种浏览器缓存折么中诞生的；
 
@@ -24,7 +29,9 @@ HDC配置文件如下
 const path = require('path')
 module.exports={
   distPath:path.join(__dirname,'./dist'),
-  floderName:'mine'// js放在目录的名字 默认是 HDC
+  floderName:'mine',// js放在目录的名字 默认是 HDC
+  ignoreAttr:'hdc-ignore', //不需要hdc 处理的 js 默认是 hdc-ignore
+  removeIgnoreAttr:true // 是否在程序结束后 移除标识  默认是true
 }
 ````
 >使用Cli方法
@@ -45,7 +52,7 @@ npm i html-disable-cache -g
 
 先安装依赖
 ````
-npm i html-disable-cache -D
+npm i html-disable-cache -S
 ````
 添加 `HDC.js` 文件
 ````js
@@ -53,7 +60,14 @@ npm i html-disable-cache -D
 // 用法
 let HDC =require('html-disable-cache')
 HDC('你的html目录的绝对路径 ');
-
+/* or
+HDC({
+  distPath:path.join(__dirname,'./dist'),
+  floderName:'mine',// js放在目录的名字 默认是 HDC
+  ignoreAttr:'hdc-ignore', //不需要hdc 处理的 js 默认是 hdc-ignore
+  removeIgnoreAttr:true // 是否在程序结束后 移除标识  默认是true
+})
+*/
 // 例如
 
 let HDC =require('html-disable-cache')
@@ -64,6 +78,17 @@ HDC(path.join(__dirname,'./dist'));
 ````
 node HDC.js
 ````
+
+---
+>0.2.0 @HDC 2019-2-19  更新
+>1. 优化错误，避免重复处理统一文件；
+>2. 优化加载代码
+>
+>0.1.7 @HDC 2019-2-17  更新
+>
+>1. 调整加载js；使js加载完毕后恢复大致原来的位置；例如在head中的；加载完后在head中；在有id的div中的加载完后还在div中，其它请况全在body中；让html开发人员在找js位置时不会一头雾水。
+>
+
 ><br>本工具主要用的思想是：<br><br>
 加载静态资源时，
 例如js，css；若是地址不变，浏览器短时间内只会再第一次加载页面时区请求服务器上的文件，之后的时候会默认从缓存中获取，这是为了加快网页的访问；当地址改变时才会去调用服务器上的资源；<BR>

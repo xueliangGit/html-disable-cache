@@ -1,8 +1,12 @@
-# html-disable-cache 
+# html-disable-cache [HDC]
 
 [[中文文档]](./README.md)
 
-![npm version](https://img.shields.io/badge/npm-0.1.5-brightgreen.svg)
+![HDC version](https://img.shields.io/badge/HDC-0.2.0-brightgreen.svg) 
+
+![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg "HDC")
+
+HDC (html-disable-cache) is a solution for your HTML browser cache. It solves the problem of browser cache for you and lets your application change with you.
 
 This is a tool to handle HTML browser caching; no matter where your page runs in the web view, it will face the test of caching, so that your web page can not be displayed in real time according to the content you updated; this tool was born in a variety of browser caching compromise;
 
@@ -23,7 +27,9 @@ The HDC configuration file is as follows
 const path = require('path')
 module.exports={
   distPath:path.join(__dirname,'./dist'),
-  floderName:'mine'// The name of JS in the directory defaults to HDC
+  floderName:'mine',// The name of JS in the directory defaults to HDC
+  ignoreAttr:'hdc-ignore', //Js that do not require hdc processing default to hdc-ignore.
+  removeIgnoreAttr:true // Whether to remove the identification after the program ends is true by default
 }
 ````
 >Using Cli method
@@ -49,7 +55,14 @@ Add `HDC.js` file
 // way
 let HDC =require('html-disable-cache')
 HDC('Absolute path to your HTML directory ');
-
+/* or
+HDC({
+  distPath:path.join(__dirname,'./dist'),
+  floderName:'mine',// js放在目录的名字 默认是 HDC
+  ignoreAttr:'hdc-ignore', //不需要hdc 处理的 js 默认是 hdc-ignore
+  removeIgnoreAttr:true // 是否在程序结束后 移除标识  默认是true
+})
+*/
 // case
 
 let HDC =require('html-disable-cache')
@@ -60,7 +73,13 @@ Run the node command
 ````
 node HDC.js
 ````
-
+> 
+>0.2.0@HDC 2019-2-19 Update
+> 1. Optimizing errors and avoiding duplication of uniform documents;
+> 2. Optimizing loading code <br>
+>
+> 0.1.7@HDC 2019-2-17 Update 
+> 1. Adjust loading js; restore JS to its original position after loading; for example, in head; in head after loading; in div with ID after loading, in body; so that HTML developers will not be confused when looking for JS location.
 
 ><br>The main ideas of this tool are:<br><br>
 When loading static resources,
