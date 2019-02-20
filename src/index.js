@@ -63,7 +63,7 @@ function disCache(obj){
 function doHtml(html,htmlUrl,baseName,htmlIndex){
   let $ = cheerio.load(html); // 加载一个 html 文本
   if($('[hdc-did]').length){
-    console.log(log_,chalk.cyanBright(htmlUrl+':该文件已经被HDC处理了'))
+    console.log(log_,chalk.cyanBright(htmlUrl+':该文件已经被HDC处理了,若要更新请手动更新该文件加载的js中的参数'))
     return false
   }
   let scripts=$(`script[src]:not([${this.conf.ignoreAttr}])`)
