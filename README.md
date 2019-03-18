@@ -2,7 +2,7 @@
 
 [[English document]](./ENREADME.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.2.0-brightgreen.svg)
+![HDC version](https://img.shields.io/badge/HDC-0.2.1-brightgreen.svg)
 
 ![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg  "HDC")
 
@@ -80,6 +80,9 @@ node HDC.js
 ````
 
 ---
+>0.2.1 @HDC 2019-3-18  更新
+>1. 优化加载，避免存在依赖时，无法进行正确顺序执行js；
+>
 >0.2.0 @HDC 2019-2-19  更新
 >1. 优化错误，避免重复处理统一文件；
 >2. 优化加载代码
