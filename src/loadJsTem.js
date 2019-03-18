@@ -17,10 +17,10 @@
     }
     // 修改 避免依赖项存在
     _run(jsArr[i], function () {
-      if (i >= jsArr.length) {
+      if (i >= jsArr.length - 1) {
         console.log('load  success.')
       } else {
-        __gorun(jsArr, i++, version)
+        __gorun(jsArr, ++i, version)
       }
     }, version)
   }
