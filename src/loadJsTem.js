@@ -8,19 +8,31 @@
     } else if (Array.isArray(obj)) {
       jsArr = obj
     }
-    __gorun(jsArr, 0, version)
-  }
-  function __gorun (jsArr, i, version) {
-    if (typeof jsArr[i] === 'string') {
-      var sufix = /\.[^\\.]+$/.exec(jsArr[i]) + ''
-      jsArr[i] = { url: jsArr[i], type: sufix.replace('.', '') }
+    var newJSarray= []
+    for(var i =0;i<jsArr.length;i++){
+      if (typeof jsArr[i] === 'string') {
+        var sufix = /\.[^\\.]+$/.exec(jsArr[i]) + ''
+        jsArr[i] = { url: jsArr[i], type: sufix.replace('.', '') }
+      }
+      if(jsArr[i].type==='js'){
+        newJSarray.push(jsArr[i])
+      }else{
+        _run(jsArr[i], (function (j) {
+            return function(){
+              console.log('load  success.'+jsArr[j].url)
+            }
+        })(i), version)
+      }
     }
+    __gorunJs(newJSarray, 0, version)
+  }
+  function __gorunJs (newJSarray, i, version) {
     // 修改 避免依赖项存在
-    _run(jsArr[i], function () {
-      if (i >= jsArr.length - 1) {
+    _run(newJSarray[i], function () {
+      if (i >= newJSarray.length - 1) {
         console.log('load  success.')
       } else {
-        __gorun(jsArr, ++i, version)
+        __gorunJs(newJSarray, ++i, version)
       }
     }, version)
   }

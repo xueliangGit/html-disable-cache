@@ -28,7 +28,8 @@ function HDC(distResolvePath,config={}){
     distPath:'',
     floderName:'HDC',
     removeIgnoreAttr:true,
-    ignoreAttr:'hdc-ignore' // 排除处理的js或者css
+    ignoreAttr:'hdc-ignore', // 排除处理的js或者css
+    doStyle:false
   }
   if(typeof distResolvePath === 'string'){
     this.conf.distPath=distResolvePath
@@ -86,12 +87,14 @@ function doHtml(html,htmlUrl,baseName,htmlIndex){
     needLoadJs.push({url:v.attribs.src,type:'js',position,id})
   })
   scripts.remove()
-  //处理 style
-  let styls=$(`link[rel="stylesheet"]:not([${this.conf.ignoreAttr}])`)
-  styls.each(function(i,v){
-    needLoadJs.push({url:v.attribs.href,type:'css',position:'head',id:''})
-  })
-  styls.remove()
+  if(this.conf.doStyle){
+    //处理 style
+    let styls=$(`link[rel="stylesheet"]:not([${this.conf.ignoreAttr}])`)
+    styls.each(function(i,v){
+      needLoadJs.push({url:v.attribs.href,type:'css',position:'head',id:''})
+    })
+    styls.remove()
+  }
   if(this.conf.removeIgnoreAttr){
     $(`script[${this.conf.ignoreAttr}]`).removeAttr(this.conf.ignoreAttr);
     $(`link[rel="stylesheet"][${this.conf.ignoreAttr}]`).removeAttr(this.conf.ignoreAttr);

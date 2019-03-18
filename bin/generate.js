@@ -20,11 +20,11 @@ program
   showinfo()
 });
 program
-.command('url [pathUrl] [floderName]')
+.command('url [pathUrl] [floderName] [doStyle]')
 .description('Use of links')
 // .alias('u')
-.action(function(pathUrl,floderName){
-  doUrl('url',pathUrl,floderName);
+.action(function(pathUrl,floderName,doStyle){
+  doUrl('url',pathUrl,floderName,doStyle);
 }).on('--help', function() {
   showinfo()
 });
@@ -44,12 +44,19 @@ function make_red(txt){
 function getStr(){
   return chalk.gray(' \n',strBy[parseInt(Math.random()*strBy.length)],'  --by 无声',' \n')
 }
-function doUrl(type,paths,floderName){
+function doUrl(type,paths,floderName,doStyle){
   let bspath = process.cwd();
   switch (type) {
     case 'url':
       paths = typeof paths ==='string'?paths:''
-      HDC(path.join(bspath,paths),floderName?{floderName}:{});
+      let body = {}
+      if(floderName){
+        body.floderName=floderName
+      }
+      if(doStyle){
+        body.doStyle=true
+      }
+      HDC(path.join(bspath,paths),body);
       break;
       case 'config':
       paths = typeof paths ==='string'?paths:'./HDC.config.js'

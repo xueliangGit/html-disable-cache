@@ -2,7 +2,7 @@
 
 [[中文文档]](./README.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.2.0-brightgreen.svg) 
+![HDC version](https://img.shields.io/badge/HDC-0.2.5-brightgreen.svg) 
 
 ![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg "HDC")
 
@@ -73,7 +73,9 @@ Run the node command
 ````
 node HDC.js
 ````
-> 
+ >0.2.5 @HDC 2019-3-18  Update
+>1. Optimize loading to avoid dependencies and fail to execute JS in the correct order;
+>
 >0.2.0@HDC 2019-2-19 Update
 > 1. Optimizing errors and avoiding duplication of uniform documents;
 > 2. Optimizing loading code <br>
