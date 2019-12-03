@@ -16,6 +16,12 @@ let log_ = chalk.blueBright('Html-disable-cache:\n    ')
  * distPath 是静态文件html文件夹的路径
  * config{
  * floderName 放js的文件夹
+ * injectCode: 要注入的代码
+ * {
+     position:'',
+     tyle:'',
+     code:''
+    }
  * }
  * */
 function HDC (distResolvePath, config = {}) {
@@ -30,12 +36,16 @@ function HDC (distResolvePath, config = {}) {
     floderName: 'HDC',
     removeIgnoreAttr: true,
     ignoreAttr: 'hdc-ignore', // 排除处理的js或者css
-    doStyle: false
+    doStyle: false,
+    injectCode: []
   }
   if (typeof distResolvePath === 'string') {
     this.conf.distPath = distResolvePath
   } else if (typeof distResolvePath === 'object') {
     Object.assign(this.conf, distResolvePath, initConf)
+  }
+  if (config.injectCode && !Array.isArray(config.injectCode)) {
+    config.injectCode = [config.injectCode]
   }
   Object.assign(this.conf, config, initConf)
   if (!fs.pathExistsSync(this.conf.distPath)) {
@@ -76,7 +86,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     //处理 style
     let styls = $(`link[rel="stylesheet"]:not([${ this.conf.ignoreAttr }])`)
     styls.each(function (i, v) {
-      needLoadJs.push({url: v.attribs.href, type: 'css', position: 'head', id: ''})
+      needLoadJs.push({ url: v.attribs.href, type: 'css', position: 'head', id: '' })
     })
     styls.remove()
   }
@@ -94,7 +104,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     } else {
       position = 'body'
     }
-    needLoadJs.push({url: v.attribs.src, type: 'js', position, id})
+    needLoadJs.push({ url: v.attribs.src, type: 'js', position, id })
   })
   scripts.remove()
 
@@ -109,12 +119,13 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
   this.conf.staticNum += needLoadJs.length
   if (needLoadJs.length) {
     this.conf.isDid++
+    injectCode($, this.conf.injectCode)
     $('body').append(`
     <script type='text/javascript' language = 'javascript' hdc-did>
     ${jsStr.replace("replaceUrl", path.relative(path.join(baseName, '../'), path.join(this.conf.distPath, jsName)).split(path.sep).join('/')) }
     </script>
     `)
-    let htmlData = minify($.html(), {removeComments: true, collapseWhitespace: true, minifyJS: true, minifyCSS: true})
+    let htmlData = minify($.html(), { removeComments: true, collapseWhitespace: true, minifyJS: true, minifyCSS: true })
     writeHtml.call(this, htmlUrl, htmlData)
     let jsData = '__loadFn(' + JSON.stringify(needLoadJs) + ',' + (+new Date()) + ');'
     writJs.call(this, path.join(this.conf.distPath, jsName), jsData)
@@ -123,6 +134,23 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
       console.log(log_, chalk.cyanBright('该文件夹下的HTML没有做处理；可能原因是：\n     1、没有引入外部JS、css \n     2、已经做过处理'))
     }
   }
+}
+function injectCode ($, code) {
+  code.forEach(v => {
+    if (typeof v === 'string') {
+      $('body').append(`
+    <script type='text/javascript' language = 'javascript' hdc-did>
+    ${v }
+    </script>
+    `)
+    } else if (typeof v === 'object') {
+      $(v.position || 'body').append(`
+      ${v.type === 'style' ? "<style  hdc-did>" : v.type === 'script' ? "<script type='text/javascript' language = 'javascript' hdc-did>" : '' }
+        ${v.code }
+      ${v.type === 'style' ? "</style>" : v.type === 'script' ? "</script>" : '' }
+      `)
+    }
+  })
 }
 function writJs (jsPath, data) {
   // console.log(jsPath)
