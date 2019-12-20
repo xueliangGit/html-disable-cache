@@ -12,6 +12,7 @@ var conf = {
 }
 let jsStr = fs.readFileSync(path.resolve(__dirname, 'loadJsTem.js'), 'utf8');
 let log_ = chalk.blueBright('Html-disable-cache:\n    ')
+const times=Date.now()
 /**
  * distPath 是静态文件html文件夹的路径
  * config{
@@ -79,13 +80,14 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     return false
   }
   let scripts = $(`script[src]:not([${ this.conf.ignoreAttr }])`)
-
+  let scriptsSrc=[]
   let needLoadJs = []
   // 处理css
   if (this.conf.doStyle) {
     //处理 style
     let styls = $(`link[rel="stylesheet"]:not([${ this.conf.ignoreAttr }])`)
     styls.each(function (i, v) {
+      scriptsSrc.push(v.attribs.href)
       needLoadJs.push({ url: v.attribs.href, type: 'css', position: 'head', id: '' })
     })
     styls.remove()
@@ -104,6 +106,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     } else {
       position = 'body'
     }
+    scriptsSrc.push(v.attribs.src)
     needLoadJs.push({ url: v.attribs.src, type: 'js', position, id })
   })
   scripts.remove()
@@ -125,10 +128,17 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     ${jsStr.replace("replaceUrl", path.relative(path.join(baseName, '../'), path.join(this.conf.distPath, jsName)).split(path.sep).join('/')) }
     </script>
     `)
+    // 支持有repreload
+    $('[rel="preload"]').each((obj, elm) => {
+      if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
+        elm.attribs.href=elm.attribs.href+'?HDC='+times
+      }
+    })
     let htmlData = minify($.html(), { removeComments: true, collapseWhitespace: true, minifyJS: true, minifyCSS: true })
     writeHtml.call(this, htmlUrl, htmlData)
-    let jsData = '__loadFn(' + JSON.stringify(needLoadJs) + ',' + (+new Date()) + ');'
+    let jsData = '__loadFn(' + JSON.stringify(needLoadJs) + ',' + (+times) + ');'
     writJs.call(this, path.join(this.conf.distPath, jsName), jsData)
+
   } else {
     if (this.conf.isDid == 0 && htmlIndex == this.conf.htmlNum) {
       console.log(log_, chalk.cyanBright('该文件夹下的HTML没有做处理；可能原因是：\n     1、没有引入外部JS、css \n     2、已经做过处理'))
