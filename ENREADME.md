@@ -2,7 +2,7 @@
 
 [[中文文档]](./README.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.2.5-brightgreen.svg) 
+![HDC version](https://img.shields.io/badge/HDC-0.3.0-brightgreen.svg) 
 
 ![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg "HDC")
 
@@ -37,7 +37,7 @@ module.exports={
 ````
 npm i html-disable-cache -g
 ````
- 
+
  Global installation `html-disable-cache` 
 1. Run the `HDC url`command in the `html` directory
 
@@ -73,15 +73,30 @@ Run the node command
 ````
 node HDC.js
 ````
+---
+
+##### update
+
+ >0.3.0 @ HDC 2019-12-20 update
+ >
+ >
+ >
+ >1. Add the function 'injectcode' that can inject code`
+ >2. Modify that if the 'preload' attribute exists in the page, the processed JS / CSS will be synchronized to process the suffix of the loaded content; avoid loading the same resource twice.
+ >
+ >
+ >
  >0.2.5 @HDC 2019-3-18  Update
->1. Optimize loading to avoid dependencies and fail to execute JS in the correct order;
->
->0.2.0@HDC 2019-2-19 Update
-> 1. Optimizing errors and avoiding duplication of uniform documents;
-> 2. Optimizing loading code <br>
->
-> 0.1.7@HDC 2019-2-17 Update 
-> 1. Adjust loading js; restore JS to its original position after loading; for example, in head; in head after loading; in div with ID after loading, in body; so that HTML developers will not be confused when looking for JS location.
+ >
+ >1. Optimize loading to avoid dependencies and fail to execute JS in the correct order;
+ >
+ >0.2.0@HDC 2019-2-19 Update
+ >1. Optimizing errors and avoiding duplication of uniform documents;
+ >2. Optimizing loading code <br>
+ >
+ >0.1.7@HDC 2019-2-17 Update 
+ >
+ >1. Adjust loading js; restore JS to its original position after loading; for example, in head; in head after loading; in div with ID after loading, in body; so that HTML developers will not be confused when looking for JS location.
 
 ><br>The main ideas of this tool are:<br><br>
 When loading static resources,

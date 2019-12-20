@@ -2,11 +2,10 @@
 
 [[English document]](./ENREADME.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.2.5-brightgreen.svg)
+![HDC version](https://img.shields.io/badge/HDC-0.3.0-brightgreen.svg)
 
 ![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg "HDC")
 
-####
 
 HDC(html-disable-cache)你的 html 浏览器缓存的一个处理方案，为你解决浏览器的缓存的问题，让你的应用随你而变.
 
@@ -19,7 +18,7 @@ HDC(html-disable-cache)你的 html 浏览器缓存的一个处理方案，为你
 
 ---
 
-## 该工具用法：
+## 该工具用法
 
 > 该工具已集成 Cli 命令
 
@@ -35,7 +34,14 @@ module.exports = {
   distPath: path.join(__dirname, "./dist"),
   floderName: "mine", // js放在目录的名字 默认是 HDC
   ignoreAttr: "hdc-ignore", //不需要hdc 处理的 js 默认是 hdc-ignore
-  removeIgnoreAttr: true // 是否在程序结束后 移除标识  默认是true
+  removeIgnoreAttr: true, // 是否在程序结束后 移除标识  默认是true
+  injectCode:{ // +0.3.0增加注入代码功能
+  {
+     position:'',// 位置 // head，body，#app
+     type:'',// script , style 空时默认直接加入
+     code:''//代码
+    }
+  }
 };
 ```
 
@@ -71,7 +77,14 @@ HDC({
   distPath:path.join(__dirname,'./dist'),
   floderName:'mine',// js放在目录的名字 默认是 HDC
   ignoreAttr:'hdc-ignore', //不需要hdc 处理的 js 默认是 hdc-ignore
-  removeIgnoreAttr:true // 是否在程序结束后 移除标识  默认是true
+  removeIgnoreAttr:true, // 是否在程序结束后 移除标识  默认是true
+  injectCode:{ // +0.3.0增加注入代码功能
+  {
+     position:'',// 位置 // head，body，#app
+     type:'',// script , style 空时默认直接加入
+     code:''//代码
+    }
+  }
 })
 */
 // 例如
@@ -88,6 +101,13 @@ node HDC.js
 ```
 
 ---
+
+更新
+
+> 0.3.0 @HDC 2019-12-20 更新
+>
+> 1. 增加可以注入代码的功能`injectCode`
+> 2. 修改若页面中存在`preload` 属性，会把处理的js/css同步去处理与加载内容的后缀；避免同一个资源加载两次。
 
 > 0.2.8 @HDC 2019-7-18 更新
 >
