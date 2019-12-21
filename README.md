@@ -2,7 +2,7 @@
 
 [[English document]](./ENREADME.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.3.0-brightgreen.svg)
+![HDC version](https://img.shields.io/badge/HDC-0.3.3-brightgreen.svg)
 
 ![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg "HDC")
 
@@ -103,6 +103,11 @@ node HDC.js
 ---
 
 更新
+
+> 0.3.3 @HDC 2019-12-21 更新
+>
+> 1. 增加`script`的`type=module`检测；自动根据原有的script的类型（例如type=module，nomodule）去自动分发资源。
+> 2. 修改若页面中存在`modulepreload` 属性，会把处理的js同步去处理与加载内容的后缀；避免同一个资源加载两次。
 
 > 0.3.0 @HDC 2019-12-20 更新
 >

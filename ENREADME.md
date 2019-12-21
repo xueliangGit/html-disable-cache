@@ -2,7 +2,7 @@
 
 [[中文文档]](./README.md)
 
-![HDC version](https://img.shields.io/badge/HDC-0.3.0-brightgreen.svg) 
+![HDC version](https://img.shields.io/badge/HDC-0.3.3-brightgreen.svg) 
 
 ![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg "HDC")
 
@@ -76,6 +76,14 @@ node HDC.js
 ---
 
 ##### update
+
+> 0.3.3 @ HDC 2019-12-21 update
+>
+> 
+>
+> 1. Add 'type = module' detection of 'script'. Automatically distribute resources according to the original script type (for example, type = module, nomodule).
+>
+> 2. Modify that if the 'modulepreload' attribute exists in the page, the processed JS will be synchronized to the suffix of the loaded content; avoid loading the same resource twice.
 
  >0.3.0 @ HDC 2019-12-20 update
  >
