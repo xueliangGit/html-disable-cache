@@ -199,7 +199,8 @@ function doHtml(html, htmlUrl, baseName, htmlIndex) {
     }
   }
 }
-function injectCode($, code) {
+function injectCode ($, code) {
+  if(!code)return
   code.forEach(v => {
     if (typeof v === 'string') {
       $('body').append(`
