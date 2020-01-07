@@ -2,7 +2,7 @@
  * @Author: xuxueliang
  * @Date: 2019-03-25 17:54:00
  * @LastEditors  : xuxueliang
- * @LastEditTime : 2020-01-07 16:19:28
+ * @LastEditTime : 2020-01-07 16:45:55
  */
 ; (function () {
   function loadFn (obj, version, callback) {
@@ -137,8 +137,10 @@
       document.getElementsByTagName('head')[0].appendChild(loadItem)
     }
   }
-  loadFn('replaceUrl', Math.random(), function () {
-    //loadErrorList
+  loadFn('replaceUrl', Math.random(), function (info) {
+    if (info.error > 0) {
+      //loadErrorList
+    }
   })
   window.__loadFn = loadFn
 })()
