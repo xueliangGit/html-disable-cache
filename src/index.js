@@ -25,7 +25,7 @@ const times = Date.now()
     }
  * }
  * */
-function HDC(distResolvePath, config = {}) {
+function HDC (distResolvePath, config = {}) {
   let initConf = {
     htmlNum: 0,
     staticNum: 0,
@@ -63,7 +63,7 @@ function HDC(distResolvePath, config = {}) {
   disCache.call(this, cache_html)
 }
 //---------some fn
-function disCache(obj) {
+function disCache (obj) {
   var j = 0
   for (let i in obj) {
     j++
@@ -76,26 +76,26 @@ function disCache(obj) {
   }
 }
 //-------- 处理html文件
-function doHtml(html, htmlUrl, baseName, htmlIndex) {
+function doHtml (html, htmlUrl, baseName, htmlIndex) {
   let $ = cheerio.load(html) // 加载一个 html 文本
   if ($('[hdc-did]').length) {
     console.log(
       log_,
       chalk.cyanBright(
         htmlUrl +
-          ':该文件已经被HDC处理了,若要更新请手动更新该文件加载的js中的参数'
+        ':该文件已经被HDC处理了,若要更新请手动更新该文件加载的js中的参数'
       )
     )
     return false
   }
-  let scripts = $(`script[src]:not([${this.conf.ignoreAttr}])`)
+  let scripts = $(`script[src]:not([${ this.conf.ignoreAttr }])`)
   let scriptsSrc = []
   let needLoadJs = []
   // 处理css
   if (this.conf.doStyle) {
     //处理 style
-    let styls = $(`link[href][rel="stylesheet"]:not([${this.conf.ignoreAttr}])`)
-    styls.each(function(i, v) {
+    let styls = $(`link[href][rel="stylesheet"]:not([${ this.conf.ignoreAttr }])`)
+    styls.each(function (i, v) {
       scriptsSrc.push(v.attribs.href)
       needLoadJs.push({
         url: v.attribs.href,
@@ -107,7 +107,7 @@ function doHtml(html, htmlUrl, baseName, htmlIndex) {
     styls.remove()
   }
   // 处理js
-  scripts.each(function(i, v) {
+  scripts.each(function (i, v) {
     let position = 'head'
     let id = ''
     let isModule = v.attribs.type === 'module'
@@ -135,8 +135,8 @@ function doHtml(html, htmlUrl, baseName, htmlIndex) {
   scripts.remove()
 
   if (this.conf.removeIgnoreAttr) {
-    $(`script[${this.conf.ignoreAttr}]`).removeAttr(this.conf.ignoreAttr)
-    $(`link[rel="stylesheet"][${this.conf.ignoreAttr}]`).removeAttr(
+    $(`script[${ this.conf.ignoreAttr }]`).removeAttr(this.conf.ignoreAttr)
+    $(`link[rel="stylesheet"][${ this.conf.ignoreAttr }]`).removeAttr(
       this.conf.ignoreAttr
     )
     // $(`script[${this.conf.ignoreAttr}]`,`link[rel="stylesheet"][${this.conf.ignoreAttr}]`).removeAttr(this.conf.ignoreAttr)
@@ -165,7 +165,8 @@ function doHtml(html, htmlUrl, baseName, htmlIndex) {
         )
         .split(path.sep)
         .join('/')
-    )}
+    ).replace('//loadErrorList', `loadFn(${ JSON.stringify(needLoadJs) },${ times })`)
+      }
     </script>
     `)
     // 支持有preload
@@ -200,12 +201,12 @@ function doHtml(html, htmlUrl, baseName, htmlIndex) {
   }
 }
 function injectCode ($, code) {
-  if(!code)return
+  if (!code) return
   code.forEach(v => {
     if (typeof v === 'string') {
       $('body').append(`
     <script type='text/javascript' language = 'javascript' hdc-did>
-    ${v}
+    ${v }
     </script>
     `)
     } else if (typeof v === 'object') {
@@ -214,18 +215,18 @@ function injectCode ($, code) {
         v.type === 'style'
           ? '<style  hdc-did>'
           : v.type === 'script'
-          ? "<script type='text/javascript' language = 'javascript' hdc-did>"
-          : ''
-      }
-        ${v.code}
+            ? "<script type='text/javascript' language = 'javascript' hdc-did>"
+            : ''
+        }
+        ${v.code }
       ${
         v.type === 'style' ? '</style>' : v.type === 'script' ? '</script>' : ''
-      }
+        }
       `)
     }
   })
 }
-function writJs(jsPath, data) {
+function writJs (jsPath, data) {
   // console.log(jsPath)
   fs.exists(path.dirname(jsPath), exists => {
     if (exists) {
@@ -239,7 +240,7 @@ function writJs(jsPath, data) {
     }
   })
 }
-function _wJs(jsPath, data) {
+function _wJs (jsPath, data) {
   fs.writeFile(jsPath, data, err => {
     if (err) throw err
     if (this.conf.show) {
@@ -252,7 +253,7 @@ function _wJs(jsPath, data) {
     }
   })
 }
-function writeHtml(filePath, data) {
+function writeHtml (filePath, data) {
   fs.writeFile(filePath, data, err => {
     if (err) throw err
     if (this.conf.show) {
@@ -266,7 +267,7 @@ function writeHtml(filePath, data) {
   })
 }
 
-function mkDirSync(basePath, newPath) {
+function mkDirSync (basePath, newPath) {
   let pathArr = newPath.split(path.sep)
   let newPathUrl = basePath
   // console.log(pathArr,newPathUrl)
@@ -277,13 +278,13 @@ function mkDirSync(basePath, newPath) {
     }
   })
 }
-function getMultiEntry(globPath) {
+function getMultiEntry (globPath) {
   var entries = {}
   let basename
   let tmp
   let pathname
   // console.log('globPath', globPath)
-  glob.sync(globPath).forEach(function(entry) {
+  glob.sync(globPath).forEach(function (entry) {
     basename = path.basename(entry, path.extname(entry))
     // console.log(entry, basename)
     // tmp = entry.split('/').splice(-4)
@@ -309,7 +310,7 @@ function getMultiEntry(globPath) {
   return entries
 }
 // 处理js
-function getUgJs(str) {
+function getUgJs (str) {
   return str
     .replace(/function /g, '__FUN__')
     .replace(/var /g, '__VAR__')
@@ -329,7 +330,7 @@ function getUgJs(str) {
     .replace(/__TYPEOF__/g, 'typeof ')
   //恢复 特殊字符
 }
-module.exports = function(...arry) {
+module.exports = function (...arry) {
   try {
     new HDC(...arry)
   } catch (e) {

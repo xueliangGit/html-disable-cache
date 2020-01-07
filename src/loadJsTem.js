@@ -2,10 +2,11 @@
  * @Author: xuxueliang
  * @Date: 2019-03-25 17:54:00
  * @LastEditors  : xuxueliang
- * @LastEditTime : 2019-12-21 16:53:24
+ * @LastEditTime : 2020-01-07 16:19:28
  */
-;(function () {
-  function loadFn (obj, version) {
+; (function () {
+  function loadFn (obj, version, callback) {
+    callback = callback || function () { }
     var jsArr = []
     if (typeof obj === 'string') {
       if (obj !== 'replaceTem') {
@@ -34,9 +35,9 @@
         )
       }
     }
-    __gorunJs(newJSarray, 0, version)
+    __gorunJs(newJSarray, 0, version, callback)
   }
-  function __gorunJs (newJSarray, i, version) {
+  function __gorunJs (newJSarray, i, version, callback) {
     // 修改 避免依赖项存在
     _run(
       newJSarray[i],
@@ -46,10 +47,18 @@
             '跳过 加载' + ['', 'esModule', 'noModule'][jsObj.moduleType]
           )
         }
+        callback.loadItem = callback.loadItem || { error: 0, success: 0, items: [] }
+        if (jsObj.e) {
+          callback.loadItem.error++
+        } else {
+          callback.loadItem.success++
+        }
+        callback.loadItem.items.push(jsObj)
         if (i >= newJSarray.length - 1) {
           console.log('load  success.')
+          callback(callback.loadItem)
         } else {
-          __gorunJs(newJSarray, ++i, version)
+          __gorunJs(newJSarray, ++i, version, callback)
         }
       },
       version
@@ -114,6 +123,12 @@
         }
       }
     }
+    loadItem.onerror = function (e) {
+      if (callback) {
+        loadItem.e = e
+        callback(loadItem)
+      }
+    }
     if (obj.id) {
       document.getElementById(obj.id).appendChild(loadItem)
     } else if (obj.position) {
@@ -122,6 +137,8 @@
       document.getElementsByTagName('head')[0].appendChild(loadItem)
     }
   }
-  loadFn('replaceUrl', Math.random())
+  loadFn('replaceUrl', Math.random(), function () {
+    //loadErrorList
+  })
   window.__loadFn = loadFn
 })()
