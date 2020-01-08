@@ -9,11 +9,11 @@
   function getStorage (prefix) {
     prefix = prefix || '_HDC_'
     var $localStorage = window.localStorage || {
-      getItem () {
+      getItem: function () {
       },
-      setItem (...a) {
+      setItem: function () {
       },
-      clear () {
+      clear: function () {
 
       }
     }
@@ -41,11 +41,11 @@
         --i
       }
     }
-    function rm (key, ori = false) {
-      $localStorage.removeItem((ori ? key : prefix) + key)
+    function rm (key, ori) {
+      $localStorage.removeItem((!!ori ? key : prefix) + key)
     }
     return {
-      get, set, clear, rm
+      get: get, set: set, clear: clear, rm: rm
     }
   }
   // XHR
@@ -279,9 +279,4 @@
     }
   }
   loadHdDCCONF(HDCCONF.url)
-  loadFn(HDCCONF.url, Math.random(), function (info) {
-    if (info.error > 0) {
-      //loadErrorList
-    }
-  })
 })()
