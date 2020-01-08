@@ -154,6 +154,7 @@
     var link = document.createElement('link')
     link.setAttribute('rel', 'prefetch')
     link.setAttribute('href', obj.url + '?HDC=' + version)
+    obj.position = 'head'
     putToHtml(obj, link, callback)
   }
   function loadStyle (cssObj, callback, version, isPrefetch) {
@@ -268,7 +269,7 @@
         getHDCJS(url, true, hdcConfCode);
       }, 1000)
     } else {
-      getHDCJS(url, false);
+      getHDCJS(url, true);
     }
   }
   window.__hdc__loadFn = loadFn;
