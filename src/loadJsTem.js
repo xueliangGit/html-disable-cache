@@ -264,10 +264,12 @@
     // 先获取缓存
     var hdcConfCode = $storage.get(url)
     if (hdcConfCode) {
-      insetJs(hdcConfCode)
       setTimeout(function () {
-        getHDCJS(url, true, hdcConfCode);
-      }, 1000)
+        insetJs(hdcConfCode)
+        setTimeout(function () {
+          getHDCJS(url, true, hdcConfCode);
+        }, 1000)
+      }, 0)
     } else {
       getHDCJS(url, true);
     }
