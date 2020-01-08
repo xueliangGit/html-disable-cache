@@ -2,7 +2,7 @@
  * @Author: xuxueliang
  * @Date: 2019-03-25 17:54:00
  * @LastEditors  : xuxueliang
- * @LastEditTime : 2020-01-08 15:02:35
+ * @LastEditTime : 2020-01-08 15:33:18
  */
 ; (function () {
   var HDCCONF = {
@@ -152,8 +152,8 @@
       (window.__browserHasModules && obj.moduleType === 2) ||
       (!window.__browserHasModules && obj.moduleType === 1)
     ) {
-      jsObj.skip = true
-      callback(jsObj)
+      obj.skip = true
+      callback(obj)
       return
     }
     var link = document.createElement('link')
@@ -242,7 +242,7 @@
               $storage.set(url, xhr.responseText)
               HDCCONF.isOld = true
               var splitStr = xhr.responseText.split('],')
-              splitStr[1] = splitStr[1].replace(')', 'function(){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
+              splitStr[1] = splitStr[1].replace(')', ',function(){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
               insetJs(splitStr.join('],'))
             } else {
               HDCCONF.isOld = false
