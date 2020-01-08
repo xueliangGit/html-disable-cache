@@ -4,8 +4,7 @@
 
 ![HDC version](https://img.shields.io/badge/HDC-0.3.3-brightgreen.svg)
 
-![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg "HDC")
-
+![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg 'HDC')
 
 HDC(html-disable-cache)你的 html 浏览器缓存的一个处理方案，为你解决浏览器的缓存的问题，让你的应用随你而变.
 
@@ -70,8 +69,8 @@ npm i html-disable-cache -S
 ```js
 // HDC.js
 // 用法
-let HDC = require("html-disable-cache");
-HDC("你的html目录的绝对路径 ");
+let HDC = require('html-disable-cache')
+HDC('你的html目录的绝对路径 ')
 /* or
 HDC({
   distPath:path.join(__dirname,'./dist'),
@@ -89,9 +88,9 @@ HDC({
 */
 // 例如
 
-let HDC = require("html-disable-cache");
-let path = require("path");
-HDC(path.join(__dirname, "./dist"));
+let HDC = require('html-disable-cache')
+let path = require('path')
+HDC(path.join(__dirname, './dist'))
 ```
 
 运行 node 命令可以
@@ -104,15 +103,30 @@ node HDC.js
 
 更新
 
+> 0.4.0 @HDC 2020-1-8 更新
+>
+> 1.优化了加载程序，支持判断是否有新的程序需要加载；使用方法回调；
+
+```js
+window.__hdc__checkUpdate(function(isOld) {
+  if (isOld) {
+    Toast.center('数据已更新即将刷新')
+    setTimeout(() => {
+      window.location.reload()
+    }, 2000)
+  }
+})
+```
+
 > 0.3.3 @HDC 2019-12-21 更新
 >
-> 1. 增加`script`的`type=module`检测；自动根据原有的script的类型（例如type=module，nomodule）去自动分发资源。
-> 2. 修改若页面中存在`modulepreload` 属性，会把处理的js同步去处理与加载内容的后缀；避免同一个资源加载两次。
+> 1. 增加`script`的`type=module`检测；自动根据原有的 script 的类型（例如 type=module，nomodule）去自动分发资源。
+> 2. 修改若页面中存在`modulepreload` 属性，会把处理的 js 同步去处理与加载内容的后缀；避免同一个资源加载两次。
 
 > 0.3.0 @HDC 2019-12-20 更新
 >
 > 1. 增加可以注入代码的功能`injectCode`
-> 2. 修改若页面中存在`preload` 属性，会把处理的js/css同步去处理与加载内容的后缀；避免同一个资源加载两次。
+> 2. 修改若页面中存在`preload` 属性，会把处理的 js/css 同步去处理与加载内容的后缀；避免同一个资源加载两次。
 
 > 0.2.8 @HDC 2019-7-18 更新
 >
