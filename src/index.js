@@ -165,10 +165,11 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
         )
         .split(path.sep)
         .join('/')
-    ).replace('//loadErrorList', `loadFn(${ JSON.stringify(needLoadJs) },${ times })`)
+    )
       }
     </script>
     `)
+    //.replace('//loadErrorList', `__hdc__loadFn(${ JSON.stringify(needLoadJs) },${ times })`)
     // 支持有preload
     $('[rel="preload"]').each((obj, elm) => {
       if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
@@ -187,7 +188,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
       minifyCSS: true
     })
     writeHtml.call(this, htmlUrl, htmlData)
-    let jsData = '__loadFn(' + JSON.stringify(needLoadJs) + ',' + +times + ');'
+    let jsData = '__hdc__loadFn(' + JSON.stringify(needLoadJs) + ',' + +times + ');'
     writJs.call(this, path.join(this.conf.distPath, jsName), jsData)
   } else {
     if (this.conf.isDid == 0 && htmlIndex == this.conf.htmlNum) {
