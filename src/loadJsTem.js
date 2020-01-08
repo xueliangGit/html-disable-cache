@@ -1,9 +1,4 @@
-/*
- * @Author: xuxueliang
- * @Date: 2019-03-25 17:54:00
- * @LastEditors  : xuxueliang
- * @LastEditTime : 2020-01-08 15:33:18
- */
+
 ; (function () {
   var HDCCONF = {
     url: 'replaceUrl',
