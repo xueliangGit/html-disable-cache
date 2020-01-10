@@ -154,7 +154,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     injectCode($, this.conf.injectCode)
     // 增加 esmodule 支持
     $('body').append(`
-    <script type="module" hdc-did>window.__browserHasModules = true;</script>
+    <script nomodule hdc-did>window.__browserHasNotModules = true;</script>
     <script type='text/javascript' language = 'javascript' hdc-did>
     ${jsStr.replace(
       'replaceUrl',

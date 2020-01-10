@@ -144,8 +144,8 @@
   }
   function _prefetch (obj, callback, version) {
     if (
-      (window.__browserHasModules && obj.moduleType === 2) ||
-      (!window.__browserHasModules && obj.moduleType === 1)
+      (!window.__browserHasNotModules && obj.moduleType === 2) ||
+      (window.__browserHasNotModules && obj.moduleType === 1)
     ) {
       obj.skip = true
       callback(obj)
@@ -167,8 +167,8 @@
   }
   function laodScript (jsObj, callback, version) {
     if (
-      (window.__browserHasModules && jsObj.moduleType === 2) ||
-      (!window.__browserHasModules && jsObj.moduleType === 1)
+      (!window.__browserHasNotModules && jsObj.moduleType === 2) ||
+      (window.__browserHasNotModules && jsObj.moduleType === 1)
     ) {
       jsObj.skip = true
       callback(jsObj)
