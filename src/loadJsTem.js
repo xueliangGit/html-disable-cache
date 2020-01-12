@@ -275,6 +275,7 @@
     }
   }
   window.__hdc__loadFn = loadFn;
+  window.__loadFn = loadFn;
   window.__hdc__checkUpdate = function (cb) {
     if (typeof cb === 'function') {
       HDCCONF.checkUpdateCall = cb
