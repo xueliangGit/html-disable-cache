@@ -153,15 +153,54 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     this.conf.isDid++
     injectCode($, this.conf.injectCode)
     // 增加 esmodule 支持
+    var sciprtMs = $('body script')
+    var hasIos10 = false
+    sciprtMs.each(function (i, v) {
+      if (v.children[0].data.indexOf('"noModule"') > -1) {
+        // 需要替换
+        $(v).remove();
+        hasIos10 = true
+        $('body').append(`
+        <script  hdc-did>
+        !(function() {
+          var e = document,
+            t = e.createElement('script')
+          if (!('noModule' in t) && 'onbeforeload' in t) {
+            var n = !1
+            e.addEventListener(
+              'beforeload',
+              function(e) {
+                if (e.target === t) {
+                  n = !0
+                  window.__browserSupportModulesIOS = true
+                } else if (!e.target.hasAttribute('nomodule') || !n) {
+                  return
+                }
+                e.preventDefault()
+              },
+              !0
+            ),
+              (t.type = 'module'),
+              (t.src = '.'),
+              e.head.appendChild(t),
+              t.remove()
+          }
+        })();</script>
+    `)
+      }
+      // console.log('sciprtMs', v, i)
+    })
+    // console.log($('body script')[sciprtMs.length - 1])
+
     $('body').append(`
     <script nomodule hdc-did>!(function() {
       var t = document.createElement('script')
-      if (!('noModule' in t) && 'onbeforeload' in t) {
+      if (!('noModule' in t) && 'onbeforeload' in t ${hasIos10 ? '&&window.__browserSupportModulesIOS' : '' }) {
         window.__browserHasNotModules = !0
       }
-    })();</script>
-    <script type='text/javascript' language = 'javascript' hdc-did>
-    ${jsStr.replace(
+}) ();</script >
+  <script type='text/javascript' language='javascript' hdc-did>
+    ${ jsStr.replace(
       'replaceUrl',
       path
         .relative(
@@ -172,9 +211,9 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
         .join('/')
     )
       }
-    </script>
-    `)
-    //.replace('//loadErrorList', `__hdc__loadFn(${ JSON.stringify(needLoadJs) },${ times })`)
+  </script>
+`)
+    //.replace('//loadErrorList', `__hdc__loadFn(${ JSON.stringify(needLoadJs) }, ${ times })`)
     // 支持有preload
     $('[rel="preload"]').each((obj, elm) => {
       if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
@@ -211,24 +250,24 @@ function injectCode ($, code) {
   code.forEach(v => {
     if (typeof v === 'string') {
       $('body').append(`
-    <script type='text/javascript' language = 'javascript' hdc-did>
-    ${v }
-    </script>
-    `)
+  < script type = 'text/javascript' language = 'javascript' hdc - did >
+    ${ v }
+    </script >
+  `)
     } else if (typeof v === 'object') {
       $(v.position || 'body').append(`
-      ${
+${
         v.type === 'style'
           ? '<style  hdc-did>'
           : v.type === 'script'
             ? "<script type='text/javascript' language = 'javascript' hdc-did>"
             : ''
         }
-        ${v.code }
-      ${
+${ v.code }
+${
         v.type === 'style' ? '</style>' : v.type === 'script' ? '</script>' : ''
         }
-      `)
+`)
     }
   })
 }
