@@ -232,7 +232,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
       minifyCSS: true
     })
     writeHtml.call(this, htmlUrl, htmlData)
-    let jsData = '(window["__hdc__loadFn"]||window["__loadFn"](' + JSON.stringify(needLoadJs) + ',' + +times + ');'
+    let jsData = '(window["__hdc__loadFn"]||window["__loadFn"])(' + JSON.stringify(needLoadJs) + ',' + +times + ');'
     writJs.call(this, path.join(this.conf.distPath, jsName), jsData)
   } else {
     if (this.conf.isDid == 0 && htmlIndex == this.conf.htmlNum) {
