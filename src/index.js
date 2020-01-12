@@ -213,7 +213,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
       }
   </script>
 `)
-    //.replace('//loadErrorList', `__hdc__loadFn(${ JSON.stringify(needLoadJs) }, ${ times })`)
+    //.replace('//loadErrorList', `(window['__hdc__loadFn']||window['__loadFn'])(${ JSON.stringify(needLoadJs) }, ${ times })`)
     // 支持有preload
     $('[rel="preload"]').each((obj, elm) => {
       if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
