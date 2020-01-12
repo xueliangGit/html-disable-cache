@@ -195,7 +195,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     $('body').append(`
     <script nomodule hdc-did>!(function() {
       var t = document.createElement('script')
-      if (!('noModule' in t) && 'onbeforeload' in t ${hasIos10 ? '&&window.__browserSupportModulesIOS' : '' }) {
+      if (!('noModule' in t) && 'onbeforeload' in t ${hasIos10 ? '&&!window.__browserSupportModulesIOS' : '' }) {
         window.__browserHasNotModules = !0
       }
 }) ();</script >
