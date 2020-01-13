@@ -8,8 +8,9 @@
   // localstroage
   function getStorage (prefix) {
     prefix = (prefix || '_HDC_') + window.location.pathname
-    var $localStorage = window.localStorage || {
+    var $localStorage = { // window.localStorage 
       getItem: function () {
+        return null
       },
       setItem: function () {
       },
