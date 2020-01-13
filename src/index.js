@@ -8,11 +8,12 @@ var minify = require('html-minifier').minify
 // let this.conf.distPath =''// 项目目录  path.join(__dirname,'../../build')
 var conf = {
   show: false,
+  fixAfterFix: true,
   floderName: 'HDC'
 }
 let jsStr = fs.readFileSync(path.resolve(__dirname, 'loadJsTem.js'), 'utf8')
 let log_ = chalk.blueBright('Html-disable-cache:\n    ')
-const times = Date.now()
+let times = 10001
 /**
  * distPath 是静态文件html文件夹的路径
  * config{
@@ -35,6 +36,7 @@ function HDC (distResolvePath, config = {}) {
     show: false,
     distPath: '',
     floderName: 'HDC',
+    fixAfterFix: true,
     removeIgnoreAttr: true,
     ignoreAttr: 'hdc-ignore', // 排除处理的js或者css
     doStyle: false,
@@ -49,6 +51,7 @@ function HDC (distResolvePath, config = {}) {
     config.injectCode = [config.injectCode]
   }
   Object.assign(this.conf, config, initConf)
+  times = this.conf.fixAfterFix ? times : Date.now()
   if (!fs.pathExistsSync(this.conf.distPath)) {
     console.log(
       log_,
