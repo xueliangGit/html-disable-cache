@@ -122,7 +122,7 @@
         }
         callback.loadItem.items.push(jsObj)
         if (i >= newJSarray.length - 1) {
-          console.log('load  success.')
+          console.log('load  success.', callback.loadItem)
           callback(callback.loadItem)
         } else {
           __gorunJs(newJSarray, ++i, version, callback, isPrefetch)
@@ -239,7 +239,7 @@
               $storage.set(url, xhr.responseText)
               HDCCONF.isOld = true
               var splitStr = xhr.responseText.split('],')
-              splitStr[1] = splitStr[1].replace(')', ',function(){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
+              splitStr[1] = splitStr[1].replace(')', ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
               insetJs(splitStr.join('],'))
             } else {
               HDCCONF.isOld = false
@@ -266,7 +266,10 @@
     var hdcConfCode = $storage.get(url)
     if (hdcConfCode) {
       setTimeout(function () {
-        insetJs(hdcConfCode)
+        // 处理现在过时的问题
+        var splitStr = hdcConfCode.split('],')
+        splitStr[1] = splitStr[1].replace(')', ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})')
+        insetJs(splitStr.join('],'))
         setTimeout(function () {
           getHDCJS(url, true, hdcConfCode);
         }, 1000)
@@ -277,6 +280,9 @@
   }
   window.__hdc__loadFn = loadFn;
   window.__loadFn = loadFn;
+  window.__hdc__clearCache = function (cb) {
+    $storage.clear()
+  }
   window.__hdc__checkUpdate = function (cb) {
     if (typeof cb === 'function') {
       HDCCONF.checkUpdateCall = cb
