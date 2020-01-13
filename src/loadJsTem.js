@@ -34,16 +34,16 @@
       }
     }
     function clear () {
-      var i = $localStorage.length
+      var i = $localStorage.length - 1
       while (i >= 0) {
-        if (~$localStorage.key(i).indexOf(prefix)) {
+        if (localStorage.key(i) && ~$localStorage.key(i).indexOf(prefix)) {
           rm($localStorage.key(i), true)
         }
         --i
       }
     }
     function rm (key, ori) {
-      $localStorage.removeItem((!!ori ? key : prefix) + key)
+      $localStorage.removeItem(!!ori ? key : (prefix + key))
     }
     return {
       get: get, set: set, clear: clear, rm: rm
