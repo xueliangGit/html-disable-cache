@@ -278,6 +278,7 @@
       getHDCJS(url, true);
     }
   }
+  window.__hdc__version = "__hdc__version__";
   window.__hdc__loadFn = loadFn;
   window.__loadFn = loadFn;
   window.__hdc__clearCache = function (cb) {

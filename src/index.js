@@ -5,6 +5,7 @@ var glob = require('glob')
 const cheerio = require('cheerio')
 const chalk = require('chalk')
 var minify = require('html-minifier').minify
+const { version } = require('../package.json')
 // let this.conf.distPath =''// 项目目录  path.join(__dirname,'../../build')
 var conf = {
   show: false,
@@ -212,7 +213,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
         )
         .split(path.sep)
         .join('/')
-    )
+    ).replace('__hdc__version__', version)
       }
   </script>
 `)
