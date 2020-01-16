@@ -236,18 +236,23 @@
           // console.log(xhr.responseText)
           if (ori) {
             if (xhr.responseText !== ori) {
-              $storage.set(url, xhr.responseText)
-              HDCCONF.isOld = true
-              var splitStr = xhr.responseText.split('],')
-              splitStr[1] = splitStr[1].replace(')', ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
-              insetJs(splitStr.join('],'))
+              if (checkIsSuccess(xhr.responseText)) {
+                $storage.set(url, xhr.responseText)
+                HDCCONF.isOld = true
+                var splitStr = xhr.responseText.split('],')
+                splitStr[1] = splitStr[1].replace(')', ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
+                insetJs(splitStr.join('],'))
+              }
             } else {
               HDCCONF.isOld = false
               HDCCONF.checkUpdateCall(HDCCONF.isOld)
             }
           } else {
-            $storage.set(url, xhr.responseText)
-            insetJs(xhr.responseText)
+            if (checkIsSuccess(xhr.responseText)) {
+              $storage.set(url, xhr.responseText)
+              insetJs(xhr.responseText)
+            } else {
+            }
           }
         }
       }
@@ -264,19 +269,27 @@
   function loadHdDCCONF (url) {
     // 先获取缓存
     var hdcConfCode = $storage.get(url)
-    if (hdcConfCode) {
+    // 去处理被劫持的情况
+    if (hdcConfCode && checkIsSuccess(hdcConfCode)) {
       setTimeout(function () {
         // 处理现在过时的问题
-        var splitStr = hdcConfCode.split('],')
-        splitStr[1] = splitStr[1].replace(')', ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})')
-        insetJs(splitStr.join('],'))
-        setTimeout(function () {
-          getHDCJS(url, true, hdcConfCode);
-        }, 1000)
+        try {
+          var splitStr = hdcConfCode.split('],')
+          splitStr[1] = splitStr[1].replace(')', ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})')
+          insetJs(splitStr.join('],'))
+          setTimeout(function () {
+            getHDCJS(url, true, hdcConfCode);
+          }, 1000)
+        } catch (e) {
+          getHDCJS(url, true);
+        }
       }, 0)
     } else {
       getHDCJS(url, true);
     }
+  }
+  function checkIsSuccess (hdcConfCode) {
+    return (hdcConfCode.indexOf('__hdc__loadFn') > -1 || hdcConfCode.indexOf('__loadFn') > -1) && hdcConfCode.indexOf('position') > -1
   }
   window.__hdc__version = "__hdc__version__";
   window.__hdc__loadFn = loadFn;
