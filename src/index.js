@@ -150,6 +150,9 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     .replace(this.conf.distPath, '')
     .split(path.sep)
     .join('_')
+  if (baseNameUrl[0] != '_') {
+    baseNameUrl = '_' + baseNameUrl
+  }
   let jsName = './' + this.conf.floderName + '/' + baseNameUrl + '.js'
   // jsName=path.relative(path.normalize(baseName,'../'),path.join(distPath,jsName))
   this.conf.staticNum += needLoadJs.length
