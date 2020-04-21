@@ -132,13 +132,13 @@ function indexedDBFactory (config) {
         .add(params);
 
       request.onsuccess = function (event) {
-        log('数据写入成功');
+        log(params.url + '数据读取成功')
         close()
         cb && cb()
       };
 
       request.onerror = function (event) {
-        log('数据写入失败');
+        log(params.url + '数据读取成功')
         close()
         cb && cb(event)
       }
@@ -162,7 +162,7 @@ function indexedDBFactory (config) {
       };
 
       request.onsuccess = function (event) {
-        log('index数据读取成功');
+        log(params + '数据读取成功')
         close()
         cb(!request.result || null, request.result)
       };
@@ -182,12 +182,12 @@ function indexedDBFactory (config) {
         .objectStore(dbConfig.table)
         .put(params);
       request.onsuccess = function (event) {
-        log('数据更新成功');
+        log(params.url + '数据读取成功')
         close()
         cb && cb()
       };
       request.onerror = function (event) {
-        log('数据更新失败');
+        log(params.url + '数据读取成功')
         close()
         cb && cb(event)
       }
@@ -207,7 +207,7 @@ function indexedDBFactory (config) {
         .delete(url);
 
       request.onsuccess = function (event) {
-        log('数据删除成功');
+        log(url + '数据读取成功')
         close()
         cb && cb()
       };
