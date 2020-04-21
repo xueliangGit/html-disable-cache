@@ -1,12 +1,10 @@
 
 ; (function () {
   var HDCCONF = {
-    loadModeIsSave: window.top !== window.self,// 在iframe 中 ，是加载缓存用的 false 直接往常加载
     url: 'replaceUrl',
     isOld: false,
     checkUpdateCall: function () { }
   }
-  // 
   // localstroage
   function getStorage (prefix) {
     prefix = (prefix || '_HDC_') + window.location.pathname
@@ -75,9 +73,7 @@
   }
   var $storage = getStorage()
   function loadFn (obj, version, callback, isPrefetch) {
-    callback = function () {
-      (callback || function () { })()
-    }
+    callback = callback || function () { }
     var jsArr = []
     if (typeof obj === 'string') {
       if (obj !== 'replaceTem') {
@@ -179,17 +175,6 @@
       callback(jsObj)
       return
     }
-    var newcode = $storage.get(jsObj.url)
-    // 若 已经缓存的code
-    if (newcode) {
-      if (!HDCCONF.loadModeIsSave) {
-        insetJs(newcode)
-      }
-      callback({})
-    } else {
-      loadJsAndSave(jsObj.url, HDCCONF.loadModeIsSave, true, callback)
-    }
-    /*
     var script = document.createElement('script')
     script.type = 'text/javascript'
     script.language = 'javascript'
@@ -206,9 +191,8 @@
         break
     }
     // script.setAttribute('src', url);
-  
+
     putToHtml(jsObj, script, callback)
-    */
   }
   function putToHtml (obj, loadItem, callback) {
     var done = false
@@ -275,35 +259,12 @@
     }
     xhr.send(null);
   }
-  // xhr loadjs inject js 
-  function loadJsAndSave (url, isRun, isAsync, callback) {
-    var xhr = createXHR()
-    xhr.open('get', url + '?HDC=' + Math.random(), !!isAsync)
-    xhr.onload = function (e) {
-      //同步接受响应
-      if (xhr.readyState == 4) {
-        if (xhr.status == 200) {
-          //实际操作
-          // console.log(xhr.responseText)
-          // if (checkIsSuccess(xhr.responseText)) {
-          if (isRun) {
-            insetJs(xhr.responseText)
-          }
-          $storage.set(url, xhr.responseText)
-          callback && callback(xhr)
-          // }
-        }
-      }
-    }
-    xhr.send(null);
-  }
   function insetJs (jsCode) {
     var script = document.createElement('script')
     script.type = 'text/javascript'
     script.innerHTML = jsCode;
     document.body.appendChild(script)
   }
-
   // 加载hdc配置文件
   function loadHdDCCONF (url) {
     // 先获取缓存

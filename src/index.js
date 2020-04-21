@@ -35,7 +35,7 @@ function HDC (distResolvePath, config = {}) {
     isDid: 0
   }
   this.conf = {
-    useFileType: 1,//1 是原来的 2 的带本地储存的
+    useFileType: 2,//1 最新的 2 原有
     show: false,
     distPath: '',
     floderName: 'HDC',
