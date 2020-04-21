@@ -12,7 +12,8 @@ var conf = {
   fixAfterFix: true,
   floderName: 'HDC'
 }
-let jsStr = fs.readFileSync(path.resolve(__dirname, 'loadJsTem.js'), 'utf8')
+
+let jsStr = null
 let log_ = chalk.blueBright('Html-disable-cache:\n    ')
 let times = 10001
 /**
@@ -34,6 +35,7 @@ function HDC (distResolvePath, config = {}) {
     isDid: 0
   }
   this.conf = {
+    useFileType: 1,//1 是原来的 2 的带本地储存的
     show: false,
     distPath: '',
     floderName: 'HDC',
@@ -52,6 +54,7 @@ function HDC (distResolvePath, config = {}) {
     config.injectCode = [config.injectCode]
   }
   Object.assign(this.conf, config, initConf)
+  jsStr = fs.readFileSync(path.resolve(__dirname, this.conf == 1 ? 'loadJsTem1.js' : 'loadJsTem2.js'), 'utf8')
   times = this.conf.fixAfterFix ? times : Date.now()
   if (!fs.pathExistsSync(this.conf.distPath)) {
     console.log(
