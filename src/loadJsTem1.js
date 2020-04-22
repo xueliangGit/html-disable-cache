@@ -310,7 +310,7 @@ function indexedDBFactory (config) {
     callback = function (items) {
       if (HDCCONF.loadModeIsSave) {
         // 需要通知外部函数
-        window.top._isLoadOk && window.top._isLoadOk()
+        window.top.__hdc__loadFn__callback && window.top.__hdc__loadFn__callback()
       }
       ; (callback_ || function () { })(items)
     }
