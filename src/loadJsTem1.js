@@ -308,6 +308,10 @@ function indexedDBFactory (config) {
   })
   function loadFn (obj, version, callback_, isPrefetch) {
     callback = function (items) {
+      if (HDCCONF.loadModeIsSave) {
+        // 需要通知外部函数
+        window.top._isLoadOk && window.top._isLoadOk()
+      }
       ; (callback_ || function () { })(items)
     }
     var jsArr = []
