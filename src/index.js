@@ -54,7 +54,7 @@ function HDC (distResolvePath, config = {}) {
     config.injectCode = [config.injectCode]
   }
   Object.assign(this.conf, config, initConf)
-  jsStr = fs.readFileSync(path.resolve(__dirname, this.conf == 1 ? 'loadJsTem1.js' : 'loadJsTem2.js'), 'utf8')
+  jsStr = fs.readFileSync(path.resolve(__dirname, this.conf.useFileType == 1 ? 'loadJsTem1.js' : 'loadJsTem2.js'), 'utf8')
   times = this.conf.fixAfterFix ? times : Date.now()
   if (!fs.pathExistsSync(this.conf.distPath)) {
     console.log(
