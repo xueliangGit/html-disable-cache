@@ -353,10 +353,10 @@
               callback.loadItem.success++
             }
             callback.loadItem.items.push(data)
-            if (!HDCCONF.loadModeIsSave) {
-              resouceCodeArray[j] = data
-              resouceIsGetNum++
-              if (resouceIsGetNum >= jsArr.length) {
+            resouceCodeArray[j] = data
+            resouceIsGetNum++
+            if (resouceIsGetNum >= jsArr.length) {
+              if (!HDCCONF.loadModeIsSave) {
                 // 加载完毕
                 var codeData = null
                 for (var o = 0; o < resouceCodeArray.length; o++) {
@@ -366,8 +366,8 @@
                 }
               }
               // insetCode(newcode, obj.type, obj.position)
+              callback(callback.loadItem)
             }
-            callback(callback.loadItem)
             // console.log('load  success.' , jsArr[j].url)
           }
         })(i),
