@@ -218,10 +218,10 @@
     function clear (cb) {
       initDb(function (db, close) {
         var _suffix = setUrl('')
-        var request = db
+        var tables = db
           .transaction([dbConfig.table], 'readwrite')
           .objectStore(dbConfig.table)
-          .openCursor()
+        var request = tables.openCursor()
         var result = []
         request.onsuccess = function (event) {
           var cursor = event.target.result
@@ -231,27 +231,28 @@
             result.push(cursor.value)
             cursor.continue()
           } else {
-            close()
             // 如果全部遍历完毕...
             console.log(_suffix)
             for (var i = 0; i < result.length; i++) {
               if (result[i] && result[i].url.indexOf(_suffix) > -1) {
-                console.log(result[i])
-                remove(
-                  result[i].url,
-                  function () {
-                    if (i === result.length - 1) {
-                      cb && cb()
-                    }
-                  },
-                  true
-                )
+                tables.delete(result[i].url)
+                // console.log(result[i])
+                // remove(
+                //   result[i].url,
+                //   function () {
+                //     if (i === result.length - 1) {
+                //       cb && cb()
+                //     }
+                //   },
+                //   true
+                // )
               }
             }
+            close()
           }
         }
         request.onerror = function (event) {
-          log('数据清除成功')
+          log('clearRE')
           close()
           cb && cb()
         }
@@ -281,6 +282,7 @@
     isOld: false,
     checkUpdateCall: function () { }
   }
+
   // XHR
   function createXHR () {
     if (typeof XMLHttpRequest != "undefined") {
@@ -304,9 +306,15 @@
     }
   }
   var $storageDb = indexedDBFactory()
+
   $storageDb.createTable('code', { keyPath: 'url' }, function () {
+    if (HDCCONF.loadModeIsSave) {
+      // 清除一下该页面下所有缓存
+      $storageDb.clear()
+    }
     console.log('-indexedDbISOK-')
   })
+
   function loadFn (obj, version, callback_, isPrefetch) {
     console.time("__hdc__load_data");
     callback = function (items) {
