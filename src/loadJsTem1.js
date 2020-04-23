@@ -84,6 +84,10 @@
         console.dir(e);
       }
     }
+    var pathArray = window.location.pathname.split('/')
+    pathArray.pop()
+    var locationPath = pathArray.join('/')
+
     function setUrl (params) {
       if (params == null) {
         return params
@@ -92,7 +96,7 @@
       if (typeofStr === 'string') {
         return params.indexOf('http') > -1
           ? params
-          : '_HDC_' + window.location.pathname + '_' + params
+          : '_HDC_' + locationPath + '/' + params
       } else if (typeofStr === 'object') {
         params.url = setUrl(params.url)
         return params
@@ -215,7 +219,7 @@
         };
       })
     }
-    function clear (cb) {
+    function clear (cb, all) {
       initDb(function (db, close) {
         var _suffix = setUrl('')
         var tables = db
@@ -232,20 +236,10 @@
             cursor.continue()
           } else {
             // 如果全部遍历完毕...
-            console.log(_suffix)
+            // console.log(_suffix)
             for (var i = 0; i < result.length; i++) {
-              if (result[i] && result[i].url.indexOf(_suffix) > -1) {
+              if (all || result[i] && result[i].url.indexOf(_suffix) > -1) {
                 tables.delete(result[i].url)
-                // console.log(result[i])
-                // remove(
-                //   result[i].url,
-                //   function () {
-                //     if (i === result.length - 1) {
-                //       cb && cb()
-                //     }
-                //   },
-                //   true
-                // )
               }
             }
             close()
@@ -532,8 +526,8 @@
   window.__hdc__version = "__hdc__version__";
   window.__hdc__loadFn = loadFn;
   window.__loadFn = loadFn;
-  window.__hdc__clearCache = function (cb) {
-    $storageDb.clear()
+  window.__hdc__clearCache = function (cb, all) {
+    $storageDb.clear(cb, all)
   }
   window.__hdc__checkUpdate = function (cb) {
     if (typeof cb === 'function') {
