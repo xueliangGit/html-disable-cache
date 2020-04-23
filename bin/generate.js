@@ -11,11 +11,11 @@ const strBy = ['当你遇到难点的时候，你应该庆幸，你又要提高�
  * 添加loadingCode文件
 */
 program
-  .command('url [pathUrl] [floderName] [doStyle]')
+  .command('url [pathUrl] [floderName] [doStyle] [useFileType]')
   .description('Use of links')
   // .alias('u')
-  .action(function (pathUrl, floderName, doStyle) {
-    doUrl('url', pathUrl, floderName, doStyle)
+  .action(function (pathUrl, floderName, doStyle, useFileType) {
+    doUrl('url', pathUrl, floderName, doStyle, useFileType)
   }).on('--help', function () {
     showinfo()
   })
@@ -32,11 +32,11 @@ program
     showinfo()
   })
 program
-  .command('url [pathUrl] [floderName] [doStyle]')
+  .command('url [pathUrl] [floderName] [doStyle] [useFileType]')
   .description('Use of links')
   // .alias('u')
-  .action(function (pathUrl, floderName, doStyle) {
-    doUrl('url', pathUrl, floderName, doStyle)
+  .action(function (pathUrl, floderName, doStyle, useFileType) {
+    doUrl('url', pathUrl, floderName, doStyle, useFileType)
   }).on('--help', function () {
     showinfo()
   })
@@ -56,7 +56,7 @@ function make_red (txt) {
 function getStr () {
   return chalk.gray(' \n', strBy[parseInt(Math.random() * strBy.length)], '  --by 无声', ' \n')
 }
-function doUrl (type, paths, floderName, doStyle) {
+function doUrl (type, paths, floderName, doStyle, useFileType) {
   let bspath = process.cwd()
   switch (type) {
     case 'url':
@@ -68,6 +68,10 @@ function doUrl (type, paths, floderName, doStyle) {
       if (doStyle) {
         body.doStyle = true
       }
+      if (useFileType) {
+        body.useFileType = useFileType
+      }
+      console.log(body)
       HDC(path.join(bspath, paths), body)
       break
     case 'config':
@@ -87,7 +91,7 @@ function doUrl (type, paths, floderName, doStyle) {
   }
 }
 function showinfo (errInfo = '') {
-  if (errInfo) console.log(chalk.red(`ERROR: ${errInfo}`))
+  if (errInfo) console.log(chalk.red(`ERROR: ${ errInfo }`))
   console.log()
   console.log(' Examples:')
   console.log()
