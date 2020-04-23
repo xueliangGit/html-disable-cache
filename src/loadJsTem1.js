@@ -360,7 +360,7 @@
               // insetCode(newcode, obj.type, obj.position)
             }
             callback(callback.loadItem)
-            console.log('load  success.' + jsArr[j].url)
+            // console.log('load  success.' , jsArr[j].url)
           }
         })(i),
         version, isPrefetch
