@@ -370,7 +370,7 @@
   function _run (obj, callback, version, isPrefetch) {
     $storageDb.read(obj.url, function (err, res) {
       if (err) {
-        loadAndSave(obj.url, isPrefetch ? false : !HDCCONF.loadModeIsSave, true, obj.type, callback, obj)
+        loadAndSave(obj.url, version, true, obj.type, callback, obj)
         return
       }
       if (isPrefetch) {
@@ -384,7 +384,7 @@
         // }
         callback({ code: newcode, obj: obj })
       } else {
-        loadAndSave(obj.url, isPrefetch ? false : !HDCCONF.loadModeIsSave, true, obj.type, callback, obj)
+        loadAndSave(obj.url, version, true, obj.type, callback, obj)
       }
     })
   }
@@ -429,9 +429,9 @@
     xhr.send(null);
   }
   // xhr loadjs inject js 
-  function loadAndSave (url, isRun, isAsync, type, callback, obj) {
+  function loadAndSave (url, version, isAsync, type, callback, obj) {
     var xhr = createXHR()
-    xhr.open('get', url + '?HDC=' + Math.random(), !!isAsync)
+    xhr.open('get', url + '?HDC=' + version, !!isAsync)
     xhr.onload = function (e) {
       //同步接受响应
       if (xhr.readyState == 4) {
@@ -459,6 +459,10 @@
     xhr.send(null);
   }
   function insetCode (code, type, obj) {
+    if (obj && obj.moduleType && obj.moduleType == 1) {
+      // 暂时不做Module 的方式
+      return
+    }
     var inset = null
     if (type === 'js') {
       inset = document.createElement('script')

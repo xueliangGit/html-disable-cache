@@ -71,7 +71,6 @@ function doUrl (type, paths, floderName, doStyle, useFileType) {
       if (useFileType) {
         body.useFileType = useFileType
       }
-      console.log(body)
       HDC(path.join(bspath, paths), body)
       break
     case 'config':
