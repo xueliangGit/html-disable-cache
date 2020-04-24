@@ -1,6 +1,7 @@
 
 ; (function () {
   function indexedDBFactory (config) {
+    //  兼容ios10 的safari
     function getStorage (prefix) {
       prefix = (prefix || '_HDC_') + window.location.pathname
       var $localStorage = window.localStorage || {
@@ -65,23 +66,27 @@
     }
     // 初始化数据库
     function initDb (cb) {
-      var openRequest = dbConfig.version ? window.indexedDB.open(dbConfig.name, dbConfig.version) : window.indexedDB.open(dbConfig.name);
-      var db = null
-      openRequest.onupgradeneeded = function (event) {
-        log("Upgrading...");//  要更新数据表，schema 时 触发；
-        cb(event.target.result, function () {
-          event.target.result.close()
-        })
-      }
-      openRequest.onsuccess = function (event) {
-        log("Success!");
-        cb(event.target.result, function () {
-          event.target.result.close()
-        })
-      }
-      openRequest.onerror = function (e) {
-        log("Error");
-        console.dir(e);
+      try {
+        var openRequest = dbConfig.version ? window.indexedDB.open(dbConfig.name, dbConfig.version) : window.indexedDB.open(dbConfig.name);
+        var db = null
+        openRequest.onupgradeneeded = function (event) {
+          log("Upgrading...");//  要更新数据表，schema 时 触发；
+          cb(event.target.result, function () {
+            event.target.result.close()
+          })
+        }
+        openRequest.onsuccess = function (event) {
+          log("Success!");
+          cb(event.target.result, function () {
+            event.target.result.close()
+          })
+        }
+        openRequest.onerror = function (e) {
+          log("Error");
+          console.dir(e);
+        }
+      } catch (e) {
+        cb(null)
       }
     }
     var pathArray = window.location.pathname.split('/')
@@ -104,12 +109,16 @@
     }
     function createTable (name, params, cb) { // array
       if (!window.indexedDB) {
-        cb && cb()
+        cb && cb(true)
         return
       }
       params = params || { keyPath: 'url', shema: [] }
       dbConfig.version = Date.now()
       initDb(function (db, close) {
+        if (!db) {
+          cb && cb(true)
+          return
+        }
         if (!db.objectStoreNames.contains(name)) {
           objectStore = db.createObjectStore(name, params.keyPath ? { keyPath: params.keyPath } : { autoIncrement: true });
           if (params.shema) {
@@ -133,6 +142,10 @@
       }
       dbConfig.version = null
       initDb(function (db, close) {
+        if (!db) {
+          cb && cb(true)
+          return
+        }
         var request = db.transaction([dbConfig.table], 'readwrite')
           .objectStore(dbConfig.table)
           .add(params);
@@ -160,6 +173,10 @@
       }
       dbConfig.version = null
       initDb(function (db, close) {
+        if (!db) {
+          cb && cb(true)
+          return
+        }
         var request = db.transaction([dbConfig.table])
           .objectStore(dbConfig.table)
           .get(params)
@@ -184,6 +201,10 @@
       }
       dbConfig.version = null
       initDb(function (db, close) {
+        if (!db) {
+          cb && cb(true)
+          return
+        }
         var request = db.transaction([dbConfig.table], 'readwrite')
           .objectStore(dbConfig.table)
           .put(params);
@@ -208,6 +229,10 @@
       }
       dbConfig.version = null
       initDb(function (db, close) {
+        if (!db) {
+          cb && cb(true)
+          return
+        }
         var request = db.transaction([dbConfig.table], 'readwrite')
           .objectStore(dbConfig.table)
           .delete(url);
@@ -221,6 +246,10 @@
     }
     function clear (cb, all) {
       initDb(function (db, close) {
+        if (!db) {
+          cb && cb(true)
+          return
+        }
         var _suffix = setUrl('')
         var tables = db
           .transaction([dbConfig.table], 'readwrite')
@@ -299,8 +328,8 @@
       throw new Error("No XHR object available")
     }
   }
-  var $storageDb = indexedDBFactory()
-
+  var $storageDb = {}
+  $storageDb = indexedDBFactory()
   $storageDb.createTable('code', { keyPath: 'url' }, function () {
     if (HDCCONF.loadModeIsSave) {
       // 清除一下该页面下所有缓存
