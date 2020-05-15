@@ -6,6 +6,10 @@
     checkUpdateCall: function () { }
   }
   // localstroage
+  if (window.localStorage.getItem(window.location.pathname + '_hdc_need_fecth_new_')) {
+    window._hdc_need_fecth_new_ = true
+    window.localStorage.removeItem(window.location.pathname + '_hdc_need_fecth_new_')
+  }
   function getStorage (prefix) {
     prefix = (prefix || '_HDC_') + window.location.pathname
     var $localStorage = window.localStorage || {
@@ -19,6 +23,7 @@
       }
     }
     function get (key) {
+      if (window._hdc_need_fecth_new_) return null
       var value = $localStorage.getItem(prefix + key)
       try {
         return JSON.parse(value)
