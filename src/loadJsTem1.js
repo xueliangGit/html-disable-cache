@@ -56,6 +56,10 @@
     if (!window.indexedDB) {
       $storage = getStorage()
     }
+    if (window.localStorage.getItem(window.location.pathname + '_hdc_need_fecth_new_')) {
+      window._hdc_need_fecth_new_ = true
+      window.localStorage.removeItem(window.location.pathname + '_hdc_need_fecth_new_')
+    }
     var dbConfig = {
       name: 'ey',
       table: '',
@@ -165,6 +169,10 @@
     }
     //读取
     function read (params, cb) {
+      if (window._hdc_need_fecth_new_) {
+        cb(true)
+        return
+      }
       params = setUrl(params)
       if (!window.indexedDB) {
         var res = $storage.get(params)
