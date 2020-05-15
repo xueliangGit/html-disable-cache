@@ -35,6 +35,7 @@ function HDC (distResolvePath, config = {}) {
     isDid: 0
   }
   this.conf = {
+    injectHDC: true, // 是否注入hdc代码到html文件中
     useFileType: 2,//1 最新的 2 原有
     show: false,
     distPath: '',
@@ -309,6 +310,9 @@ function _wJs (jsPath, data) {
   })
 }
 function writeHtml (filePath, data) {
+  if (!this.conf.injectHDC) {
+    return false
+  }
   fs.writeFile(filePath, data, err => {
     if (err) throw err
     if (this.conf.show) {
