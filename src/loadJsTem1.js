@@ -151,13 +151,13 @@
           .add(params);
 
         request.onsuccess = function (event) {
-          log(params.url + 'RS')
+          log(params.url + 'WS')
           close()
           cb && cb()
         };
 
         request.onerror = function (event) {
-          log(params.url + 'RE')
+          log(params.url + 'WE')
           close()
           cb && cb(event)
         }
@@ -209,12 +209,12 @@
           .objectStore(dbConfig.table)
           .put(params);
         request.onsuccess = function (event) {
-          log(params.url + 'RS')
+          log(params.url + 'US')
           close()
           cb && cb()
         };
         request.onerror = function (event) {
-          log(params.url + 'RE')
+          log(params.url + 'UE')
           close()
           cb && cb(event)
         }
@@ -238,7 +238,7 @@
           .delete(url);
 
         request.onsuccess = function (event) {
-          log(url + 'RS')
+          log(url + 'RMS')
           close()
           cb && cb()
         };
@@ -333,7 +333,7 @@
   $storageDb.createTable('code', { keyPath: 'url' }, function () {
     if (HDCCONF.loadModeIsSave) {
       // 清除一下该页面下所有缓存
-      $storageDb.clear()
+      // $storageDb.clear()
     }
     console.log('-indexedDbISOK-')
   })
@@ -380,7 +380,7 @@
             resouceIsGetNum++
             if (resouceIsGetNum >= jsArr.length) {
               if (!HDCCONF.loadModeIsSave) {
-                // 加载完毕
+                // 加载完毕 根据需要去注入js
                 var codeData = null
                 for (var o = 0; o < resouceCodeArray.length; o++) {
                   if (codeData = resouceCodeArray[o]) {
