@@ -432,12 +432,14 @@
           if (ori) {
             if (xhr.responseText !== ori) {
               if (checkIsSuccess(xhr.responseText)) {
-                $storageDb.update({ url: url, code: xhr.responseText }, function (err, res) {
+                $storageDb.clear(null, function () {
+                  $storageDb.add({ url: url, code: xhr.responseText }, function (err, res) {
+                  })
+                  HDCCONF.isOld = true
+                  var splitStr = xhr.responseText.split('],')
+                  splitStr[1] = splitStr[1].replace(')', ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
+                  insetCode(splitStr.join('],'), 'js')
                 })
-                HDCCONF.isOld = true
-                var splitStr = xhr.responseText.split('],')
-                splitStr[1] = splitStr[1].replace(')', ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
-                insetCode(splitStr.join('],'), 'js')
               }
             } else {
               HDCCONF.isOld = false
