@@ -6,6 +6,7 @@ const cheerio = require('cheerio')
 const chalk = require('chalk')
 var minify = require('html-minifier').minify
 const { version } = require('../package.json')
+
 // let this.conf.distPath =''// 项目目录  path.join(__dirname,'../../build')
 var conf = {
   show: false,
@@ -20,7 +21,7 @@ let times = 10001
  * distPath 是静态文件html文件夹的路径
  * config{
  * floderName 放js的文件夹
- * injectCode: 要注入的代码
+ * injectCode:要注入的代码
  * {
      position:'',
      tyle:'',
@@ -55,7 +56,15 @@ function HDC (distResolvePath, config = {}) {
     config.injectCode = [config.injectCode]
   }
   Object.assign(this.conf, config, initConf)
-  jsStr = fs.readFileSync(path.resolve(__dirname, this.conf.useFileType == 1 ? 'loadJsTem1.js' : 'loadJsTem2.js'), 'utf8')
+  let useFileTypeArray = ['', 'loadJsTem1.js', 'loadJsTem2.js', 'loadJsTem3.js']
+  jsStr = fs.readFileSync(path.resolve(__dirname, useFileTypeArray[this.conf.useFileType]), 'utf8')
+  jsStr = jsStr.replace('__hdc__version__', version)
+  this.hdcsrc = path.join(this.conf.distPath, this.conf.floderName, `hdc.${ version }.min.js`)
+  if (+this.conf.useFileType === 3) {
+    this.conf.staticNum += 1
+    var UglifyJS = require('uglify-js');
+    writJs.call(this, this.hdcsrc, UglifyJS.minify(jsStr).code)
+  }
   times = this.conf.fixAfterFix ? times : Date.now()
   if (!fs.pathExistsSync(this.conf.distPath)) {
     console.log(
@@ -66,8 +75,8 @@ function HDC (distResolvePath, config = {}) {
   }
   console.log(log_, chalk.yellow('HDC处理的目录是 ' + this.conf.distPath))
   var cache_html = getMultiEntry(this.conf.distPath + '/**/**/*.html') // 获得入口js文件
-  // console.log(cache_html)
   this.conf.htmlNum = Object.keys(cache_html).length
+  this.conf.staticNum += this.conf.htmlNum
   disCache.call(this, cache_html)
 }
 //---------some fn
@@ -102,7 +111,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
   // 处理css
   if (this.conf.doStyle) {
     //处理 style
-    let styls = $(`link[href][rel="stylesheet"]:not([${ this.conf.ignoreAttr }])`)
+    let styls = $(`link[href][rel = "stylesheet"]:not([${ this.conf.ignoreAttr }])`)
     styls.each(function (i, v) {
       scriptsSrc.push(v.attribs.href)
       needLoadJs.push({
@@ -144,10 +153,10 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
 
   if (this.conf.removeIgnoreAttr) {
     $(`script[${ this.conf.ignoreAttr }]`).removeAttr(this.conf.ignoreAttr)
-    $(`link[rel="stylesheet"][${ this.conf.ignoreAttr }]`).removeAttr(
+    $(`link[rel = "stylesheet"][${ this.conf.ignoreAttr }]`).removeAttr(
       this.conf.ignoreAttr
     )
-    // $(`script[${this.conf.ignoreAttr}]`,`link[rel="stylesheet"][${this.conf.ignoreAttr}]`).removeAttr(this.conf.ignoreAttr)
+    // $(`script[${ this.conf.ignoreAttr }]`,`link[rel = "stylesheet"][${ this.conf.ignoreAttr }]`).removeAttr(this.conf.ignoreAttr)
   }
   let baseNameUrl = path
     .normalize(baseName, '/')
@@ -159,72 +168,85 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
   }
   let jsName = './' + this.conf.floderName + '/' + baseNameUrl + '.js'
   // jsName=path.relative(path.normalize(baseName,'../'),path.join(distPath,jsName))
-  this.conf.staticNum += needLoadJs.length
   if (needLoadJs.length) {
     this.conf.isDid++
     injectCode($, this.conf.injectCode)
     // 增加 esmodule 支持
     var sciprtMs = $('body script')
     var hasIos10 = false
-    sciprtMs.each(function (i, v) {
+    sciprtMs.each((i, v) => {
       if (v.children[0].data.indexOf('"noModule"') > -1) {
         // 需要替换
         $(v).remove();
         hasIos10 = true
         $('body').append(`
-        <script  hdc-did>
-        !(function() {
-          var e = document,
-            t = e.createElement('script')
-          if (!('noModule' in t) && 'onbeforeload' in t) {
-            var n = !1
-            e.addEventListener(
-              'beforeload',
-              function(e) {
-                if (e.target === t) {
-                  n = !0
-                  window.__browserSupportModulesIOS = true
-                } else if (!e.target.hasAttribute('nomodule') || !n) {
-                  return
-                }
-                e.preventDefault()
-              },
-              !0
-            ),
-              (t.type = 'module'),
-              (t.src = '.'),
-              e.head.appendChild(t),
-              t.remove()
-          }
-        })();</script>
-    `)
+  <script  hdc-did>
+    !(function () {
+      var e = document,
+        t = e.createElement('script')
+      if (!('noModule' in t) && 'onbeforeload' in t) {
+        var n = !1
+        e.addEventListener(
+          'beforeload',
+          function (e) {
+            if (e.target === t) {
+              n = !0
+              window.__browserSupportModulesIOS = true
+            } else if (!e.target.hasAttribute('nomodule') || !n) {
+              return
+            }
+            e.preventDefault()
+          },
+          !0
+        ),
+          (t.type='module'),
+          (t.src = '.'),
+          e.head.appendChild(t),
+          t.remove()
+      }
+    })();</script>
+      `)
       }
       // console.log('sciprtMs', v, i)
     })
     // console.log($('body script')[sciprtMs.length - 1])
 
     $('body').append(`
-    <script nomodule hdc-did>!(function() {
-      var t = document.createElement('script')
-      if (!('noModule' in t) && 'onbeforeload' in t ${hasIos10 ? '&&!window.__browserSupportModulesIOS' : '' }) {
-        window.__browserHasNotModules = !0
-      }
-}) ();</script >
-  <script type='text/javascript' language='javascript' hdc-did>
-    ${ jsStr.replace(
-      'replaceUrl',
-      path
+      <script nomodule hdc-did> !(function () {
+        var t = document.createElement('script')
+        if (!('noModule' in t) && 'onbeforeload' in t ${ hasIos10 ? '&&!window.__browserSupportModulesIOS' : '' }) {
+          window.__browserHasNotModules = !0
+        }
+      })();</script> ${
+      +this.conf.useFileType === 3 ? `<script type='text/javascript' charset="utf-8" language='javascript' src='${ path
         .relative(
           path.join(baseName, '../'),
-          path.join(this.conf.distPath, jsName)
+          this.hdcsrc
         )
         .split(path.sep)
-        .join('/')
-    ).replace('__hdc__version__', version)
+        .join('/') }' hdc='${ path
+          .relative(
+            path.join(baseName, '../'),
+            path.join(this.conf.distPath, jsName)
+          )
+          .split(path.sep)
+          .join('/') }' hdc-did></script>` : `
+  <script type='text/javascript' charset="utf-8" language='javascript' hdc-did>
+    ${ jsStr.replace(
+            'replaceUrl',
+            path
+              .relative(
+                path.join(baseName, '../'),
+                path.join(this.conf.distPath, jsName)
+              )
+              .split(path.sep)
+              .join('/')
+          )
+        }
+    </script>`
       }
-  </script>
 `)
-    //.replace('//loadErrorList', `(window['__hdc__loadFn']||window['__loadFn'])(${ JSON.stringify(needLoadJs) }, ${ times })`)
+    //.replace('//loadErrorList', `(window['__hdc__loadFn'] || window['__loadFn'])(${ JSON.stringify(needLoadJs) }, ${ times })`)
     // 支持有preload
     $('[rel="preload"]').each((obj, elm) => {
       if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
@@ -261,9 +283,9 @@ function injectCode ($, code) {
   code.forEach(v => {
     if (typeof v === 'string') {
       $('body').append(`
-  < script type = 'text/javascript' language = 'javascript' hdc - did >
+  <script type='text/javascript' language='javascript' hdc-did>
     ${ v }
-    </script >
+    </script>
   `)
     } else if (typeof v === 'object') {
       $(v.position || 'body').append(`
@@ -271,7 +293,7 @@ ${
         v.type === 'style'
           ? '<style  hdc-did>'
           : v.type === 'script'
-            ? "<script type='text/javascript' language = 'javascript' hdc-did>"
+            ? "<script type='text/javascript' language='javascript' hdc-did>"
             : ''
         }
 ${ v.code }
@@ -306,6 +328,9 @@ function _wJs (jsPath, data) {
     if (this.conf.staticNum === 0) {
       console.log()
       console.log(log_, chalk.green(' js文件已建立'))
+      if (this.conf.htmlNum === 0) {
+        overOp.call(this)
+      }
     }
   })
 }
@@ -322,10 +347,15 @@ function writeHtml (filePath, data) {
     if (this.conf.htmlNum === 0) {
       console.log()
       console.log(log_, chalk.green(' html文件处理完毕'))
+      if (this.conf.staticNum === 0) {
+        overOp.call(this)
+      }
     }
   })
 }
-
+function overOp () {
+  this.conf.finish && this.conf.finish()
+}
 function mkDirSync (basePath, newPath) {
   let pathArr = newPath.split(path.sep)
   let newPathUrl = basePath

@@ -206,7 +206,7 @@
         !done &&
         (!loadItem.readyState ||
           loadItem.readyState == 'loaded' ||
-          loadItem.readyState == 'compvare')
+          loadItem.readyState == 'complete')
       ) {
         done = true
         loadItem.onload = loadItem.onreadystatechange = null
