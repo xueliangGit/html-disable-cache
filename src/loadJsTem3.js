@@ -57,10 +57,10 @@
     if (!window.indexedDB) {
       $storage = getStorage()
     }
-    if (window.localStorage.getItem(window.location.pathname + '_hdc_need_fecth_new_')) {
-      window._hdc_need_fecth_new_ = true
-      window.localStorage.removeItem(window.location.pathname + '_hdc_need_fecth_new_')
-    }
+    // if (window.localStorage.getItem(window.location.pathname + '_hdc_need_fecth_new_')) {
+    //   window._hdc_need_fecth_new_ = true
+    //   window.localStorage.removeItem(window.location.pathname + '_hdc_need_fecth_new_')
+    // }
     var dbConfig = {
       name: 'ey',
       table: '',
@@ -348,13 +348,7 @@
   }
   var $storageDb = {}
   $storageDb = indexedDBFactory()
-  $storageDb.createTable('hdcconf', { keyPath: 'url' }, function () {
-    if (HDCCONF.loadModeIsSave) {
-      // 清除一下该页面下所有缓存
-      // $storageDb.clear()
-    }
-    console.log('-indexedDbISOK-')
-  })
+
 
   function loadFn (obj, version, callback, isPrefetch) {
     callback = callback || function () { }
@@ -447,7 +441,7 @@
     var style = document.createElement('link')
     style.setAttribute('rel', 'stylesheet')
     style.setAttribute('type', 'text/css')
-    style.setAttribute('href', cssObj.url + '?HDC=' + version)
+    style.setAttribute('href', cssObj.url + (version === 10001 ? '' : ('?HDC=' + version)))
     putToHtml(cssObj, style, callback)
   }
   function laodScript (jsObj, callback, version) {
@@ -463,7 +457,7 @@
     script.type = 'text/javascript'
     script.language = 'javascript'
     script.charset = 'utf-8'
-    script.src = jsObj.url + '?HDC=' + version
+    script.src = jsObj.url + (version === 10001 ? '' : ('?HDC=' + version))
     switch (jsObj.moduleType) {
       case 1:
         script.type = 'module'
@@ -653,5 +647,12 @@
       window.__hdc__checkUpdate__callback = cb
     }
   }
-  loadHdDCCONF(HDCCONF.url)
+  $storageDb.createTable('hdcconf', { keyPath: 'url' }, function () {
+    if (HDCCONF.loadModeIsSave) {
+      // 清除一下该页面下所有缓存
+      // $storageDb.clear()
+    }
+    console.log('-indexedDbISOK-')
+    loadHdDCCONF(HDCCONF.url)
+  })
 })()

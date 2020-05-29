@@ -248,16 +248,18 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
 `)
     //.replace('//loadErrorList', `(window['__hdc__loadFn'] || window['__loadFn'])(${ JSON.stringify(needLoadJs) }, ${ times })`)
     // 支持有preload
-    $('[rel="preload"]').each((obj, elm) => {
-      if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
-        elm.attribs.href = elm.attribs.href + '?HDC=' + times
-      }
-    })
-    $('[rel="modulepreload"]').each((obj, elm) => {
-      if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
-        elm.attribs.href = elm.attribs.href + '?HDC=' + times
-      }
-    })
+    if (this.conf.useFileType !== 3) {
+      $('[rel="preload"]').each((obj, elm) => {
+        if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
+          elm.attribs.href = elm.attribs.href + '?HDC=' + times
+        }
+      })
+      $('[rel="modulepreload"]').each((obj, elm) => {
+        if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
+          elm.attribs.href = elm.attribs.href + '?HDC=' + times
+        }
+      })
+    }
     let htmlData = minify($.html(), {
       removeComments: true,
       collapseWhitespace: true,
