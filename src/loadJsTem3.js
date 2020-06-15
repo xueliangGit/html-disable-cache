@@ -505,7 +505,9 @@
   // 通过xhr 去获取文件信息
   function getHDCJS (url, isAsync, ori) {
     var xhr = createXHR()
-    xhr.open('get', url + '?HDC=' + Math.random(), !!isAsync)
+    // 第一次加载时不要加HDC后缀，让他直接加载；
+    // 在检测是否更新时需要，也就是ORI存在时，需要加HDC；
+    xhr.open('get', ori ? url + '?HDC=' + Math.random() : url, !!isAsync)
     xhr.onload = function (e) {
       //同步接受响应
       if (xhr.readyState == 4) {

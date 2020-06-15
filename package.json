@@ -1,6 +1,6 @@
 {
   "name": "html-disable-cache",
-  "version": "0.5.21-beta",
+  "version": "0.5.22",
   "description": "HDC (html-disable-cache) is a solution for your HTML browser cache. It solves the problem of browser cache for you and lets your application change with you.",
   "main": "./src/index.js",
   "scripts": {
