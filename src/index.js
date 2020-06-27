@@ -59,7 +59,9 @@ function HDC (distResolvePath, config = {}) {
   let useFileTypeArray = ['', 'loadJsTem1.js', 'loadJsTem2.js', 'loadJsTem3.js']
   jsStr = fs.readFileSync(path.resolve(__dirname, useFileTypeArray[this.conf.useFileType]), 'utf8')
   jsStr = jsStr.replace('__hdc__version__', version)
-  this.hdcsrc = path.join(this.conf.distPath, this.conf.floderName, `hdc.${ version }.min.js`)
+  // this.hdcsrc = path.join(this.conf.distPath, this.conf.floderName, `hdc.${ version }.min.js`)
+  // 优化版本升级导致的误差
+  this.hdcsrc = path.join(this.conf.distPath, this.conf.floderName, `hdc.min.js`)
   if (+this.conf.useFileType === 3) {
     this.conf.staticNum += 1
     var UglifyJS = require('uglify-js');
