@@ -63,9 +63,14 @@ function HDC (distResolvePath, config = {}) {
   // 优化版本升级导致的误差
   this.hdcsrc = path.join(this.conf.distPath, this.conf.floderName, `hdc.min.js`)
   if (+this.conf.useFileType === 3) {
-    this.conf.staticNum += 1
-    var UglifyJS = require('uglify-js');
-    writJs.call(this, this.hdcsrc, UglifyJS.minify(jsStr).code)
+    // 支持设置公共的url  只是针对useFileType=3
+    if (this.conf.hdcUrl) {
+      this.hdcsrc = this.conf.hdcUrl
+    } else {
+      this.conf.staticNum += 1
+      var UglifyJS = require('uglify-js');
+      writJs.call(this, this.hdcsrc, UglifyJS.minify(jsStr).code)
+    }
   }
   times = this.conf.fixAfterFix ? times : Date.now()
   if (!fs.pathExistsSync(this.conf.distPath)) {
@@ -220,7 +225,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
           window.__browserHasNotModules = !0
         }
       })();</script> ${
-      +this.conf.useFileType === 3 ? `<script type='text/javascript' charset="utf-8" language='javascript' src='${ path
+      +this.conf.useFileType === 3 ? `<script type='text/javascript' charset="utf-8" language='javascript' src='${ this.hdcsrc.indexOf('http') === 0 ? this.hdcsrc : path
         .relative(
           path.join(baseName, '../'),
           this.hdcsrc
