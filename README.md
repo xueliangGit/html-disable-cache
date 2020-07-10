@@ -17,27 +17,23 @@ HDC(html-disable-cache)你的 html 浏览器缓存的一个处理方案，为你
 
 ---
 
-**hdc@0.6.0**
+**hdc@0.6.0-beta**
 
-增加了处理hdc的方式；通过`useFileType`来区分使用的方式，使用文件来分开的
+增加了处理 hdc 的方式；通过`useFileType`来区分使用的方式，使用文件来分开的
 
 `useFileType`​
 
 1. 使用`indexDb`来缓存配置文件以及静态文件；只要加载一遍，之后的加载不用再请求网络；
 2. 使用`localStorage`来储存配置文件，其他静态文件直接走浏览器的缓存机制
-3. 使用`indexDb`来储存配置文件，其他静态文件直接走浏览器的缓存机制（可以配合serviceworker和applicationCache使用）
+3. 使用`indexDb`来储存配置文件，其他静态文件直接走浏览器的缓存机制（可以配合 serviceworker 和 applicationCache 使用）
 
 更改处理方式，不在注入代码，使用外链形式来引入代码
 
 ```html
-<script hdc='HDC/_index.js' src='./HDC/hdc.min.js' ></script>
+<script hdc="HDC/_index.js" src="./HDC/hdc.min.js"></script>
 ```
 
-
-
 ---
-
-
 
 ## 该工具用法
 
@@ -129,10 +125,10 @@ node HDC.js
 
 更新
 
->  0.6.0@HDC 2020-07-10
+> 0.6.0@HDC 2020-07-10
 >
-> 1. 修改hdc处理的文件为外链形式统一放在hdc目录下
-> 2. 
+> 1. 修改 hdc 处理的文件为外链形式统一放在 hdc 目录下
+> 2. 使用外链形式引入 hdc
 
 > 0.5.23 @HDC
 >
