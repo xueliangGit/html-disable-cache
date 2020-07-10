@@ -1,9 +1,35 @@
 
 ; (function () {
+  var elmConf = (function () {
+    var scripts = document.getElementsByTagName('script')
+    for (var i = scripts.length - 1; i >= 0; i--) {
+      var target = scripts[i]
+      if (target.getAttribute('hdc')) {
+        var obj = {}
+        obj['hdc'] = target.getAttribute('hdc')
+        if (target.getAttribute('expire')) {
+          obj['expire'] = target.getAttribute('expire')
+        }
+        if (target.getAttribute('loadtype')) {
+          obj['loadType'] = target.getAttribute('loadtype')
+        }
+        return obj
+      }
+    }
+    return {}
+  })();
   var HDCCONF = {
-    url: 'replaceUrl',
+    startTime: Date.now(),
+    loadModeIsSave: window.HDCISONLYLOAD !== undefined ? window.HDCISONLYLOAD : window.top !== window.self,// 在iframe 中 ，是加载缓存用的 false 直接往常加载
+    url: window.HDCCONFURL || elmConf.hdc,
+    loadType: window.HDCCONFLOADTYPE || (elmConf.loadType || 1),
+    expire: window.HDCCONFEXPIRE || elmConf.expire || 'w2',
     isOld: false,
     checkUpdateCall: function () { }
+  }
+  if (!HDCCONF.url) {
+    console.error('未发现hdc配置信息，请按照要求设置')
+    return
   }
   // localstroage
   if (window.localStorage.getItem(window.location.pathname + '_hdc_need_fecth_new_')) {
@@ -168,7 +194,7 @@
     var style = document.createElement('link')
     style.setAttribute('rel', 'stylesheet')
     style.setAttribute('type', 'text/css')
-    style.setAttribute('href', cssObj.url + '?HDC=' + version)
+    style.setAttribute('href', cssObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version)))
     putToHtml(cssObj, style, callback)
   }
   function laodScript (jsObj, callback, version) {
@@ -184,7 +210,7 @@
     script.type = 'text/javascript'
     script.language = 'javascript'
     script.charset = 'utf-8'
-    script.src = jsObj.url + '?HDC=' + version
+    script.src = jsObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version))
     switch (jsObj.moduleType) {
       case 1:
         script.type = 'module'
@@ -232,17 +258,19 @@
   // 通过xhr 去获取文件信息
   function getHDCJS (url, isAsync, ori) {
     var xhr = createXHR()
-    xhr.open('get', url + '?HDC=' + Math.random(), !!isAsync)
+    xhr.open('get', ori ? url + '?HDC=' + Math.random() : url, !!isAsync)
     xhr.onload = function (e) {
       //同步接受响应
       if (xhr.readyState == 4) {
         if (xhr.status == 200) {
+          var expire = getTimes(HDCCONF.expire)
           //实际操作
           // console.log(xhr.responseText)
           if (ori) {
             if (xhr.responseText !== ori) {
               if (checkIsSuccess(xhr.responseText)) {
                 $storage.set(url, xhr.responseText)
+                $storage.set(url + '_expire', expire)
                 HDCCONF.isOld = true
                 var splitStr = xhr.responseText.split('],')
                 splitStr[1] = splitStr[1].replace(')', ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
@@ -255,6 +283,7 @@
           } else {
             if (checkIsSuccess(xhr.responseText)) {
               $storage.set(url, xhr.responseText)
+              $storage.set(url + '_expire', expire)
               insetJs(xhr.responseText)
             } else {
             }
@@ -270,12 +299,25 @@
     script.innerHTML = jsCode;
     document.body.appendChild(script)
   }
+  // 获取时间戳
+  function getTimes (timeStr) {
+    var flag = timeStr.substr(0, 1)
+    var day = timeStr.substr(1) || 2
+    var ObjConfig = {
+      w: 7,
+      y: 365,
+      m: 30,
+      d: 1
+    }
+    return (ObjConfig[flag] || 7) * day * 60 * 60 * 24 * 1000 + Date.now()
+  }
   // 加载hdc配置文件
   function loadHdDCCONF (url) {
     // 先获取缓存
     var hdcConfCode = $storage.get(url)
+    var hdcConfCodeExpire = $storage.get(url + '_expire')
     // 去处理被劫持的情况
-    if (hdcConfCode && checkIsSuccess(hdcConfCode)) {
+    if (hdcConfCodeExpire && hdcConfCodeExpire >= Date.now() && hdcConfCode && checkIsSuccess(hdcConfCode)) {
       setTimeout(function () {
         // 处理现在过时的问题
         try {

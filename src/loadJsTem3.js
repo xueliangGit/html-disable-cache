@@ -307,23 +307,37 @@
     }
     return indexDbApi()
   }
+  var elmConf = (function () {
+    var scripts = document.getElementsByTagName('script')
+    for (var i = scripts.length - 1; i >= 0; i--) {
+      var target = scripts[i]
+      if (target.getAttribute('hdc')) {
+        var obj = {}
+        obj['hdc'] = target.getAttribute('hdc')
+        if (target.getAttribute('expire')) {
+          obj['expire'] = target.getAttribute('expire')
+        }
+        if (target.getAttribute('loadtype')) {
+          obj['loadType'] = target.getAttribute('loadtype')
+        }
+        return obj
+      }
+    }
+    return {}
+  })();
   var HDCCONF = {
     startTime: Date.now(),
-    loadModeIsSave: window.top !== window.self,// 在iframe 中 ，是加载缓存用的 false 直接往常加载
-    url: window.HDCCONFURL || (function () {
-      var scripts = document.getElementsByTagName('script')
-      for (var i = scripts.length - 1; i >= 0; i--) {
-        var target = scripts[i]
-        if (target.getAttribute('hdc')) {
-          return target.getAttribute('hdc')
-        }
-      }
-      return ''
-    })(),
+    loadModeIsSave: window.HDCISONLYLOAD !== undefined ? window.HDCISONLYLOAD : window.top !== window.self,// 在iframe 中 ，是加载缓存用的 false 直接往常加载
+    url: window.HDCCONFURL || elmConf.hdc,
     isOld: false,
+    loadType: window.HDCCONFLOADTYPE || (elmConf.loadType || 1),
+    expire: window.HDCCONFEXPIRE || elmConf.expire || 'w2',
     checkUpdateCall: function () { }
   }
-
+  if (!HDCCONF.url) {
+    console.error('未发现hdc配置信息，请按照要求设置')
+    return
+  }
   // XHR
   function createXHR () {
     if (typeof XMLHttpRequest != "undefined") {
@@ -441,7 +455,7 @@
     var style = document.createElement('link')
     style.setAttribute('rel', 'stylesheet')
     style.setAttribute('type', 'text/css')
-    style.setAttribute('href', cssObj.url + (version === 10001 ? '' : ('?HDC=' + version)))
+    style.setAttribute('href', cssObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version)))
     putToHtml(cssObj, style, callback)
   }
   function laodScript (jsObj, callback, version) {
@@ -457,7 +471,7 @@
     script.type = 'text/javascript'
     script.language = 'javascript'
     script.charset = 'utf-8'
-    script.src = jsObj.url + (version === 10001 ? '' : ('?HDC=' + version))
+    script.src = jsObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version))
     switch (jsObj.moduleType) {
       case 1:
         script.type = 'module'
@@ -514,10 +528,11 @@
         if (xhr.status == 200) {
           //实际操作
           // console.log(xhr.responseText)
+          var expire = getTimes(HDCCONF.expire)
           if (ori) {
             if (xhr.responseText !== ori) {
               if (checkIsSuccess(xhr.responseText)) {
-                $storageDb.update({ url: url, code: xhr.responseText }, function (err, res) {
+                $storageDb.update({ url: url, expire: expire, code: xhr.responseText }, function (err, res) {
                 })
                 HDCCONF.isOld = true
                 var splitStr = xhr.responseText.split('],')
@@ -530,7 +545,7 @@
             }
           } else {
             if (checkIsSuccess(xhr.responseText)) {
-              $storageDb.add({ url: url, code: xhr.responseText })
+              $storageDb.add({ url: url, expire: expire, code: xhr.responseText })
               // $storageDb.set(url, xhr.responseText)
               insetCode(xhr.responseText, 'js')
             } else {
@@ -543,6 +558,18 @@
 
     }
     xhr.send(null);
+  }
+  // 获取时间戳
+  function getTimes (timeStr) {
+    var flag = timeStr.substr(0, 1)
+    var day = timeStr.substr(1) || 2
+    var ObjConfig = {
+      w: 7,
+      y: 365,
+      m: 30,
+      d: 1
+    }
+    return (ObjConfig[flag] || 7) * day * 60 * 60 * 24 * 1000 + Date.now()
   }
   // xhr loadjs inject js 
   function loadAndSave (url, version, isAsync, type, callback, obj) {
@@ -610,6 +637,12 @@
     // 先获取缓存
     $storageDb.read(url, function (err, res) {
       if (err) {
+        getHDCJS(url, true);
+        return
+      }
+      // 判断是否过期
+      if (!res.expire || res.expire < Date.now()) {
+        // 过期
         getHDCJS(url, true);
         return
       }

@@ -306,12 +306,32 @@
     }
     return indexDbApi()
   }
+  var elmConf = (function () {
+    var scripts = document.getElementsByTagName('script')
+    for (var i = scripts.length - 1; i >= 0; i--) {
+      var target = scripts[i]
+      if (target.getAttribute('hdc')) {
+        var obj = {}
+        obj[hdc] = target.getAttribute('hdc')
+        if (target.getAttribute('expire')) {
+          obj[expire] = target.getAttribute('expire')
+        }
+        return obj
+      }
+    }
+    return {}
+  })();
   var HDCCONF = {
     startTime: Date.now(),
-    loadModeIsSave: window.top !== window.self,// 在iframe 中 ，是加载缓存用的 false 直接往常加载
-    url: 'replaceUrl',
+    loadModeIsSave: window.HDCISONLYLOAD !== undefined ? window.HDCISONLYLOAD : window.top !== window.self,// 在iframe 中 ，是加载缓存用的 false 直接往常加载
+    url: window.HDCCONFURL || elmConf.hdc,
     isOld: false,
+    expire: window.HDCCONFEXPIRE || elmConf.expire || 'w2',
     checkUpdateCall: function () { }
+  }
+  if (!HDCCONF.url) {
+    console.error('未发现hdc配置信息，请按照要求设置')
+    return
   }
 
   // XHR
@@ -437,10 +457,11 @@
         if (xhr.status == 200) {
           //实际操作
           // console.log(xhr.responseText)
+          var expire = getTimes(HDCCONF.expire)
           if (ori) {
             if (xhr.responseText !== ori) {
               if (checkIsSuccess(xhr.responseText)) {
-                $storageDb.update({ url: url, code: xhr.responseText }, function (err, res) {
+                $storageDb.update({ url: url, expire: expire, code: xhr.responseText }, function (err, res) {
                 })
                 HDCCONF.isOld = true
                 var splitStr = xhr.responseText.split('],')
@@ -453,7 +474,7 @@
             }
           } else {
             if (checkIsSuccess(xhr.responseText)) {
-              $storageDb.add({ url: url, code: xhr.responseText })
+              $storageDb.add({ url: url, expire: expire, code: xhr.responseText })
               // $storageDb.set(url, xhr.responseText)
               insetCode(xhr.responseText, 'js')
             } else {
@@ -466,6 +487,18 @@
 
     }
     xhr.send(null);
+  }
+  // 获取时间戳
+  function getTimes (timeStr) {
+    var flag = timeStr.substr(0, 1)
+    var day = timeStr.substr(1) || 2
+    var ObjConfig = {
+      w: 7,
+      y: 365,
+      m: 30,
+      d: 1
+    }
+    return (ObjConfig[flag] || 7) * day * 60 * 60 * 24 * 1000 + Date.now()
   }
   // xhr loadjs inject js 
   function loadAndSave (url, version, isAsync, type, callback, obj) {

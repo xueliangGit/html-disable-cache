@@ -45,7 +45,11 @@ function HDC (distResolvePath, config = {}) {
     removeIgnoreAttr: true,
     ignoreAttr: 'hdc-ignore', // 排除处理的js或者css
     doStyle: false,
-    injectCode: []
+    injectCode: [],
+    loadType: null,
+    expire: null,
+    url: null,
+    loadModeIsSave:null
   }
   if (typeof distResolvePath === 'string') {
     this.conf.distPath = distResolvePath
