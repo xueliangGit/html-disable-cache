@@ -14,11 +14,14 @@
         clear: function () {
         }
       }
-      function get (key) {
+      function get (key, cb) {
         var value = $localStorage.getItem(prefix + key)
         try {
-          return JSON.parse(value)
+          var Obj = JSON.parse(value)
+          cb && cb(null, Obj)
+          return Obj
         } catch (e) {
+          cb && cb(null, value)
           return value
         }
       }
@@ -38,8 +41,9 @@
           --i
         }
       }
-      function rm (key, ori) {
+      function rm (key, cb, ori) {
         $localStorage.removeItem(!!ori ? key : (prefix + key))
+        cb && cb(null)
       }
       return {
         createTable: function () { },
@@ -545,7 +549,12 @@
             }
           } else {
             if (checkIsSuccess(xhr.responseText)) {
-              $storageDb.add({ url: url, expire: expire, code: xhr.responseText })
+              if (window._HDCCONFIG_IS_EXPIRE) {
+                delete window._HDCCONFIG_IS_EXPIRE
+                $storageDb.update({ url: url, expire: expire, code: xhr.responseText })
+              } else {
+                $storageDb.add({ url: url, expire: expire, code: xhr.responseText })
+              }
               // $storageDb.set(url, xhr.responseText)
               insetCode(xhr.responseText, 'js')
             } else {
@@ -643,6 +652,7 @@
       // 判断是否过期
       if (!res.expire || res.expire < Date.now()) {
         // 过期
+        window._HDCCONFIG_IS_EXPIRE = true
         getHDCJS(url, true);
         return
       }

@@ -17,6 +17,28 @@ HDC(html-disable-cache)你的 html 浏览器缓存的一个处理方案，为你
 
 ---
 
+**hdc@0.6.0**
+
+增加了处理hdc的方式；通过`useFileType`来区分使用的方式，使用文件来分开的
+
+`useFileType`​
+
+1. 使用`indexDb`来缓存配置文件以及静态文件；只要加载一遍，之后的加载不用再请求网络；
+2. 使用`localStorage`来储存配置文件，其他静态文件直接走浏览器的缓存机制
+3. 使用`indexDb`来储存配置文件，其他静态文件直接走浏览器的缓存机制（可以配合serviceworker和applicationCache使用）
+
+更改处理方式，不在注入代码，使用外链形式来引入代码
+
+```html
+<script hdc='HDC/_index.js' src='./HDC/hdc.min.js' ></script>
+```
+
+
+
+---
+
+
+
 ## 该工具用法
 
 > 该工具已集成 Cli 命令
@@ -40,7 +62,11 @@ module.exports = {
      type:'',// script , style 空时默认直接加入
      code:''//代码
     }
-  }
+  },
+  useFileType:2,//
+  loadType:1, //(v0.6.0+) 【1，2】默认是1；加载方式1 是不加随机参数，2加随机参数，； 这个随机参数时 生成hdc加载文件时固定生成的；只限本次处理生成使用，只要重新处理，加载的都是一样的链接
+expire:'w2',//(v0.6.0+)【d,w,m,y】[Number]本地配置文件储存过期时间；默认是2周；可以设为年月周日（y,m,w,d）;例如有效期1个月,'m1'即可
+loadModeIsSave:window.top!==window.self//（v0.6.0+）【true/flase】 默认是顶级窗口下正常使用，iframe下只是加载；ture只是加载加载，false正常使用
 };
 ```
 
@@ -102,6 +128,11 @@ node HDC.js
 ---
 
 更新
+
+>  0.6.0@HDC 2020-07-10
+>
+> 1. 修改hdc处理的文件为外链形式统一放在hdc目录下
+> 2. 
 
 > 0.5.23 @HDC
 >

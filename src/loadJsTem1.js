@@ -312,9 +312,9 @@
       var target = scripts[i]
       if (target.getAttribute('hdc')) {
         var obj = {}
-        obj[hdc] = target.getAttribute('hdc')
+        obj['hdc'] = target.getAttribute('hdc')
         if (target.getAttribute('expire')) {
-          obj[expire] = target.getAttribute('expire')
+          obj['expire'] = target.getAttribute('expire')
         }
         return obj
       }
@@ -450,7 +450,7 @@
   // 通过xhr 去获取文件信息
   function getHDCJS (url, isAsync, ori) {
     var xhr = createXHR()
-    xhr.open('get', url + '?HDC=' + Math.random(), !!isAsync)
+    xhr.open('get', ori ? url + '?HDC=' + Math.random() : url, !!isAsync)
     xhr.onload = function (e) {
       //同步接受响应
       if (xhr.readyState == 4) {
@@ -474,7 +474,12 @@
             }
           } else {
             if (checkIsSuccess(xhr.responseText)) {
-              $storageDb.add({ url: url, expire: expire, code: xhr.responseText })
+              if (window._HDCCONFIG_IS_EXPIRE) {
+                delete window._HDCCONFIG_IS_EXPIRE
+                $storageDb.update({ url: url, expire: expire, code: xhr.responseText })
+              } else {
+                $storageDb.add({ url: url, expire: expire, code: xhr.responseText })
+              }
               // $storageDb.set(url, xhr.responseText)
               insetCode(xhr.responseText, 'js')
             } else {
@@ -569,11 +574,16 @@
         getHDCJS(url, true);
         return
       }
+      if (res.expire && res.expire < Date.now()) {
+        window._HDCCONFIG_IS_EXPIRE = true
+        getHDCJS(url, true);
+        return
+      }
       var hdcConfCode = res.code
       // 去处理被劫持的情况
+      // 处理现在过时的问题
       if (hdcConfCode && checkIsSuccess(hdcConfCode)) {
         setTimeout(function () {
-          // 处理现在过时的问题
           try {
             var splitStr = hdcConfCode.split('],')
             splitStr[1] = splitStr[1].replace(')', ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})')

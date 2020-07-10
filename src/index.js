@@ -6,6 +6,7 @@ const cheerio = require('cheerio')
 const chalk = require('chalk')
 var minify = require('html-minifier').minify
 const { version } = require('../package.json')
+const { time } = require('console')
 
 // let this.conf.distPath =''// 项目目录  path.join(__dirname,'../../build')
 var conf = {
@@ -49,7 +50,7 @@ function HDC (distResolvePath, config = {}) {
     loadType: null,
     expire: null,
     url: null,
-    loadModeIsSave:null
+    loadModeIsSave: null
   }
   if (typeof distResolvePath === 'string') {
     this.conf.distPath = distResolvePath
@@ -60,23 +61,39 @@ function HDC (distResolvePath, config = {}) {
     config.injectCode = [config.injectCode]
   }
   Object.assign(this.conf, config, initConf)
+  // 判断一些预设量
+  let insertStr = ``
+  if (this.conf.loadType !== null) {
+    insertStr += `window.HDCCONFLOADTYPE=${ this.conf.loadType };`
+  }
+  if (this.conf.expire !== null) {
+    insertStr += `window.HDCCONFEXPIRE='${ this.conf.expire }';`
+  }
+  if (this.conf.loadModeIsSave !== null) {
+    insertStr += `window.HDCCONFISONLYLOAD=${ this.conf.loadModeIsSave };`
+  }
+  if (this.conf.url !== null) {
+    insertStr += `window.HDCCONFURL='${ this.conf.url }';`
+  }
   let useFileTypeArray = ['', 'loadJsTem1.js', 'loadJsTem2.js', 'loadJsTem3.js']
   jsStr = fs.readFileSync(path.resolve(__dirname, useFileTypeArray[this.conf.useFileType]), 'utf8')
   jsStr = jsStr.replace('__hdc__version__', version)
   // this.hdcsrc = path.join(this.conf.distPath, this.conf.floderName, `hdc.${ version }.min.js`)
   // 优化版本升级导致的误差
   this.hdcsrc = path.join(this.conf.distPath, this.conf.floderName, `hdc.min.js`)
-  if (+this.conf.useFileType === 3) {
-    // 支持设置公共的url  只是针对useFileType=3
-    if (this.conf.hdcUrl) {
-      this.hdcsrc = this.conf.hdcUrl
-    } else {
-      this.conf.staticNum += 1
-      var UglifyJS = require('uglify-js');
-      writJs.call(this, this.hdcsrc, UglifyJS.minify(jsStr).code)
-    }
+  // 0.6.0 修改为所有的都都输出到文件里
+  // if (+this.conf.useFileType === 3) {
+  // 支持设置公共的url  只是针对useFileType=3
+  if (this.conf.hdcUrl) {
+    this.hdcsrc = this.conf.hdcUrl
+  } else {
+    this.conf.staticNum += 1
+    var UglifyJS = require('uglify-js');
+    console.log(insertStr)
+    writJs.call(this, this.hdcsrc, UglifyJS.minify(insertStr + jsStr).code)
   }
-  times = this.conf.fixAfterFix ? times : Date.now()
+  // }
+  times = this.conf.fixAfterFix || this.conf.loadType === 1 || this.conf.loadType === null ? times : Date.now()
   if (!fs.pathExistsSync(this.conf.distPath)) {
     console.log(
       log_,
@@ -229,7 +246,8 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
           window.__browserHasNotModules = !0
         }
       })();</script> ${
-      +this.conf.useFileType === 3 ? `<script type='text/javascript' charset="utf-8" language='javascript' src='${ this.hdcsrc.indexOf('http') === 0 ? this.hdcsrc : path
+      /*+this.conf.useFileType === 3 ?*/
+      `<script type='text/javascript' charset="utf-8" language='javascript' src='${ this.hdcsrc.indexOf('http') === 0 ? this.hdcsrc : path
         .relative(
           path.join(baseName, '../'),
           this.hdcsrc
@@ -241,7 +259,8 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
             path.join(this.conf.distPath, jsName)
           )
           .split(path.sep)
-          .join('/') }' hdc-did></script>` : `
+          .join('/') }' hdc-did></script>`
+      /*: `
   <script type='text/javascript' charset="utf-8" language='javascript' hdc-did>
     ${ jsStr.replace(
             'replaceUrl',
@@ -255,11 +274,12 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
           )
         }
     </script>`
+    */
       }
 `)
     //.replace('//loadErrorList', `(window['__hdc__loadFn'] || window['__loadFn'])(${ JSON.stringify(needLoadJs) }, ${ times })`)
     // 支持有preload
-    if (this.conf.useFileType !== 3) {
+    if (this.conf.loadType !== 2) {
       $('[rel="preload"]').each((obj, elm) => {
         if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
           elm.attribs.href = elm.attribs.href + '?HDC=' + times
