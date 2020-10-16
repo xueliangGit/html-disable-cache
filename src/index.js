@@ -64,16 +64,16 @@ function HDC (distResolvePath, config = {}) {
   // 判断一些预设量
   let insertStr = ``
   if (this.conf.loadType !== null) {
-    insertStr += `window.HDCCONFLOADTYPE=${ this.conf.loadType };`
+    insertStr += `window.HDCCONFLOADTYPE=${this.conf.loadType};`
   }
   if (this.conf.expire !== null) {
-    insertStr += `window.HDCCONFEXPIRE='${ this.conf.expire }';`
+    insertStr += `window.HDCCONFEXPIRE='${this.conf.expire}';`
   }
   if (this.conf.loadModeIsSave !== null) {
-    insertStr += `window.HDCCONFISONLYLOAD=${ this.conf.loadModeIsSave };`
+    insertStr += `window.HDCCONFISONLYLOAD=${this.conf.loadModeIsSave};`
   }
   if (this.conf.url !== null) {
-    insertStr += `window.HDCCONFURL='${ this.conf.url }';`
+    insertStr += `window.HDCCONFURL='${this.conf.url}';`
   }
   let useFileTypeArray = ['', 'loadJsTem1.js', 'loadJsTem2.js', 'loadJsTem3.js']
   jsStr = fs.readFileSync(path.resolve(__dirname, useFileTypeArray[this.conf.useFileType]), 'utf8')
@@ -133,13 +133,13 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     )
     return false
   }
-  let scripts = $(`script[src]:not([${ this.conf.ignoreAttr }])`)
+  let scripts = $(`script[src]:not([${this.conf.ignoreAttr}])`)
   let scriptsSrc = []
   let needLoadJs = []
   // 处理css
   if (this.conf.doStyle) {
     //处理 style
-    let styls = $(`link[href][rel = "stylesheet"]:not([${ this.conf.ignoreAttr }])`)
+    let styls = $(`link[href][rel = "stylesheet"]:not([${this.conf.ignoreAttr}])`)
     styls.each(function (i, v) {
       scriptsSrc.push(v.attribs.href)
       needLoadJs.push({
@@ -180,8 +180,8 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
   scripts.remove()
 
   if (this.conf.removeIgnoreAttr) {
-    $(`script[${ this.conf.ignoreAttr }]`).removeAttr(this.conf.ignoreAttr)
-    $(`link[rel = "stylesheet"][${ this.conf.ignoreAttr }]`).removeAttr(
+    $(`script[${this.conf.ignoreAttr}]`).removeAttr(this.conf.ignoreAttr)
+    $(`link[rel = "stylesheet"][${this.conf.ignoreAttr}]`).removeAttr(
       this.conf.ignoreAttr
     )
     // $(`script[${ this.conf.ignoreAttr }]`,`link[rel = "stylesheet"][${ this.conf.ignoreAttr }]`).removeAttr(this.conf.ignoreAttr)
@@ -242,24 +242,24 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     $('body').append(`
       <script nomodule hdc-did> !(function () {
         var t = document.createElement('script')
-        if (!('noModule' in t) && 'onbeforeload' in t ${ hasIos10 ? '&&!window.__browserSupportModulesIOS' : '' }) {
+        if (!('noModule' in t) && 'onbeforeload' in t ${hasIos10 ? '&&!window.__browserSupportModulesIOS' : ''}) {
           window.__browserHasNotModules = !0
         }
       })();</script> ${
       /*+this.conf.useFileType === 3 ?*/
-      `<script type='text/javascript' charset="utf-8" language='javascript' src='${ this.hdcsrc.indexOf('http') === 0 ? this.hdcsrc : path
+      `<script type='text/javascript' charset="utf-8" language='javascript' src='${this.hdcsrc.indexOf('http') === 0 ? this.hdcsrc : path
         .relative(
           path.join(baseName, '../'),
           this.hdcsrc
         )
         .split(path.sep)
-        .join('/') }' hdc='${ path
+        .join('/')}' hdc='${path
           .relative(
             path.join(baseName, '../'),
             path.join(this.conf.distPath, jsName)
           )
           .split(path.sep)
-          .join('/') }' hdc-did></script>`
+          .join('/')}' hdc-did></script>`
       /*: `
   <script type='text/javascript' charset="utf-8" language='javascript' hdc-did>
     ${ jsStr.replace(
@@ -279,7 +279,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
 `)
     //.replace('//loadErrorList', `(window['__hdc__loadFn'] || window['__loadFn'])(${ JSON.stringify(needLoadJs) }, ${ times })`)
     // 支持有preload
-    if (this.conf.loadType !== 2) {
+    if (this.conf.loadType === 2) {
       $('[rel="preload"]').each((obj, elm) => {
         if (scriptsSrc.indexOf(elm.attribs.href) > -1) {
           elm.attribs.href = elm.attribs.href + '?HDC=' + times
@@ -317,21 +317,19 @@ function injectCode ($, code) {
     if (typeof v === 'string') {
       $('body').append(`
   <script type='text/javascript' language='javascript' hdc-did>
-    ${ v }
+    ${v}
     </script>
   `)
     } else if (typeof v === 'object') {
       $(v.position || 'body').append(`
-${
-        v.type === 'style'
+${v.type === 'style'
           ? '<style  hdc-did>'
           : v.type === 'script'
             ? "<script type='text/javascript' language='javascript' hdc-did>"
             : ''
         }
-${ v.code }
-${
-        v.type === 'style' ? '</style>' : v.type === 'script' ? '</script>' : ''
+${v.code}
+${v.type === 'style' ? '</style>' : v.type === 'script' ? '</script>' : ''
         }
 `)
     }
