@@ -203,7 +203,7 @@ function doHtml (html, htmlUrl, baseName, htmlIndex) {
     var sciprtMs = $('body script')
     var hasIos10 = false
     sciprtMs.each((i, v) => {
-      if (v.children[0].data.indexOf('"noModule"') > -1) {
+      if (v.children[0] && v.children[0].data.indexOf('"noModule"') > -1) {
         // 需要替换
         $(v).remove();
         hasIos10 = true

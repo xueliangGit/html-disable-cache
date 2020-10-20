@@ -3,6 +3,7 @@
 [[English document]](./ENREADME.md)
 
 ![HDC version](https://img.shields.io/npm/v/html-disable-cache.svg?style=flat)
+![HDC dm](https://img.shields.io/npm/dm/html-disable-cache.svg?style=flat)
 
 ![HDC](https://raw.githubusercontent.com/xueliangGit/html-disable-cache/master/assets/hdc.jpg 'HDC')
 
