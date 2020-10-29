@@ -440,7 +440,7 @@
     }
   }
   function _prefetch (obj, callback, version) {
-    let text = { 'js': 'script', 'css': 'style' }
+    var text = { 'js': 'script', 'css': 'style' }
     if (
       (!window.__browserHasNotModules && obj.moduleType === 2) ||
       (window.__browserHasNotModules && obj.moduleType === 1)
