@@ -440,6 +440,7 @@
     }
   }
   function _prefetch (obj, callback, version) {
+    let text = { 'js': 'script', 'css': 'style' }
     if (
       (!window.__browserHasNotModules && obj.moduleType === 2) ||
       (window.__browserHasNotModules && obj.moduleType === 1)
@@ -449,8 +450,10 @@
       return
     }
     var link = document.createElement('link')
-    link.setAttribute('rel', 'prefetch')
-    link.setAttribute('href', obj.url + '?HDC=' + version)
+    // link.setAttribute('rel', 'prefetch')
+    link.setAttribute('rel', 'preload')
+    link.setAttribute('href', obj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version)))
+    link.setAttribute('as', text[obj.type])
     obj.position = 'head'
     putToHtml(obj, link, callback)
   }
