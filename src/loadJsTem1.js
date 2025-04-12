@@ -569,12 +569,12 @@
     // 先获取缓存
     $storageDb.read(url, function (err, res) {
       if (err) {
-        getHDCJS(url, true)
+        getHDCJS(url, false)
         return
       }
       if (res.expire && res.expire < Date.now()) {
         window._HDCCONFIG_IS_EXPIRE = true
-        getHDCJS(url, true)
+        getHDCJS(url, false)
         return
       }
       var hdcConfCode = res.code
@@ -582,22 +582,22 @@
       // 处理现在过时的问题
       if (hdcConfCode && checkIsSuccess(hdcConfCode)) {
         // setTimeout(function () {
-          try {
-            var splitStr = hdcConfCode.split('],')
-            splitStr[1] = splitStr[1].replace(
-              ')',
-              ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})'
-            )
-            insetCode(splitStr.join('],'), 'js')
-            setTimeout(function () {
-              getHDCJS(url, true, hdcConfCode)
-            }, HDCCONF.checkUpdateDelay)
-          } catch (e) {
-            getHDCJS(url, true)
-          }
+        try {
+          var splitStr = hdcConfCode.split('],')
+          splitStr[1] = splitStr[1].replace(
+            ')',
+            ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})'
+          )
+          insetCode(splitStr.join('],'), 'js')
+          setTimeout(function () {
+            getHDCJS(url, true, hdcConfCode)
+          }, HDCCONF.checkUpdateDelay)
+        } catch (e) {
+          getHDCJS(url, false)
+        }
         // }, 0)
       } else {
-        getHDCJS(url, true)
+        getHDCJS(url, false)
       }
     })
   }

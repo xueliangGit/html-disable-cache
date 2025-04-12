@@ -639,14 +639,14 @@
     // 先获取缓存
     $storageDb.read(url, function (err, res) {
       if (err) {
-        getHDCJS(url, true)
+        getHDCJS(url, false)
         return
       }
       // 判断是否过期
       if (!res.expire || res.expire < Date.now()) {
         // 过期
         window._HDCCONFIG_IS_EXPIRE = true
-        getHDCJS(url, true)
+        getHDCJS(url, false)
         return
       }
       var hdcConfCode = res.code
@@ -665,11 +665,11 @@
             getHDCJS(url, true, hdcConfCode)
           }, HDCCONF.checkUpdateDelay)
         } catch (e) {
-          getHDCJS(url, true)
+          getHDCJS(url, false)
         }
         // }, 0)
       } else {
-        getHDCJS(url, true)
+        getHDCJS(url, false)
       }
     })
   }

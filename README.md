@@ -61,7 +61,7 @@ module.exports = {
     }
   },
   useFileType:2,//3 使用indexDb 2 使用localStorage 记录缓存文件 默认是2
-  loadType:1, //(v0.6.0+) 【1，2】默认是1；加载方式1 是不加随机参数，2加随机参数，； 这个随机参数时 生成hdc加载文件时固定生成的；只限本次处理生成使用，只要重新处理，加载的都是一样的链接
+  loadType:1, //(v0.6.0+) 【1，2】默认是1；加载方式1 是不加随机参数，2加随机参数，； 这个随机参数时 生成hdc加载文件时固定生成的；只限本次处理生成使用，只要重新处理，加载的都是一样的链接；//建议在文件有hash值是默认1即可，是固定名字时，使用2；
 expire:'w2',//(v0.6.0+)【d,w,m,y】[Number]本地配置文件储存过期时间；默认是2周；可以设为年月周日（y,m,w,d）;例如有效期1个月,'m1'即可
 loadModeIsSave:window.top!==window.self//（v0.6.0+）【true/flase】 默认是顶级窗口下正常使用，iframe下只是加载；ture只是加载加载，false正常使用
 entryFileLoadErrorInfo: null,// 当入口文件加载失败时显示的信息，默认为null，不显示；
@@ -136,7 +136,7 @@ node HDC.js
 > 3. 增加配置信息`checkcheckUpdateDelay`检查更新的延迟时间 默认是 1000（ms）
 > 4. 优化 useFileType 优化默认是 2， 使用 localStorage 来储存配置文件，3 是使用 indexDb 来储存配置文件
 > 5. 优化每次获取更新文件都是需要携带随机参数的，避免缓存问题
-> 6. 优化执行方式
+> 6. 优化执行方式,加载程序时 xhr 为同步加载文件（减少插件加载的影响），检查时是异步的
 
 > 0.6.0@HDC 2020-07-10
 >

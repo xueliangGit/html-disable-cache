@@ -184,7 +184,7 @@
     }
     var link = document.createElement('link')
     link.setAttribute('rel', 'prefetch')
-    link.setAttribute('href', obj.url + '?HDC=' + version)
+    link.setAttribute('href', obj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : '?HDC=' + version))
     obj.position = 'head'
     putToHtml(obj, link, callback)
   }
@@ -249,7 +249,7 @@
       document.getElementsByTagName('head')[0].appendChild(loadItem)
     }
   }
-  // 通过xhr 去获取文件信息
+  // 通过xhr 去获取文件信息 只有在检查时才会异步，没有缓存是加载需要同步
   function getHDCJS(url, isAsync, ori) {
     var xhr = createXHR()
     xhr.open('get', url + '?HDC=' + Math.random(), !!isAsync)
@@ -343,11 +343,11 @@
           }, HDCCONF.checkUpdateDelay)
         }
       } catch (e) {
-        getHDCJS(url, true)
+        getHDCJS(url, false)
       }
       // }, 0)
     } else {
-      getHDCJS(url, true)
+      getHDCJS(url, false)
     }
   }
   function checkIsSuccess(hdcConfCode) {
