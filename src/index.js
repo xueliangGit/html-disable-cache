@@ -11,7 +11,6 @@ const { time } = require('console')
 // let this.conf.distPath =''// 项目目录  path.join(__dirname,'../../build')
 var conf = {
   show: false,
-  fixAfterFix: true,
   floderName: 'HDC'
 }
 
@@ -43,7 +42,6 @@ function HDC(distResolvePath, config = {}) {
     show: false,
     distPath: '',
     floderName: 'HDC',
-    fixAfterFix: true,
     removeIgnoreAttr: true,
     ignoreAttr: 'hdc-ignore', // 排除处理的js或者css
     doStyle: false,
@@ -103,7 +101,7 @@ function HDC(distResolvePath, config = {}) {
     writJs.call(this, this.hdcsrc, UglifyJS.minify(insertStr + jsStr).code)
   }
   // }
-  times = this.conf.fixAfterFix || this.conf.loadType === 1 || this.conf.loadType === null ? times : Date.now()
+  times = this.conf.loadType === 1 || this.conf.loadType === null ? times : Date.now()
   if (!fs.pathExistsSync(this.conf.distPath)) {
     console.log(log_, chalk.yellow('需要保证 ' + this.conf.distPath + '目录存在'))
     process.exit(0)
