@@ -1,5 +1,4 @@
-
-; (function () {
+;(function () {
   var elmConf = (function () {
     var scripts = document.getElementsByTagName('script')
     for (var i = scripts.length - 1; i >= 0; i--) {
@@ -17,15 +16,16 @@
       }
     }
     return {}
-  })();
+  })()
   var HDCCONF = {
     startTime: Date.now(),
-    loadModeIsSave: window.HDCISONLYLOAD !== undefined ? window.HDCISONLYLOAD : window.top !== window.self,// 在iframe 中 ，是加载缓存用的 false 直接往常加载
+    loadModeIsSave: window.HDCISONLYLOAD !== undefined ? window.HDCISONLYLOAD : window.top !== window.self, // 在iframe 中 ，是加载缓存用的 false 直接往常加载
     url: window.HDCCONFURL || elmConf.hdc,
-    loadType: window.HDCCONFLOADTYPE || (elmConf.loadType || 1),
+    loadType: window.HDCCONFLOADTYPE || elmConf.loadType || 1,
     expire: window.HDCCONFEXPIRE || elmConf.expire || 'w2',
     isOld: false,
-    checkUpdateCall: function () { }
+    checkUpdateCall: function () {},
+    checkUpdateDelay: window.HDCCHECKUPDATEDELAY || 1000
   }
   if (!HDCCONF.url) {
     console.error('未发现hdc配置信息，请按照要求设置')
@@ -36,19 +36,16 @@
     window._hdc_need_fecth_new_ = true
     window.localStorage.removeItem(window.location.pathname + '_hdc_need_fecth_new_')
   }
-  function getStorage (prefix) {
+  function getStorage(prefix) {
     prefix = (prefix || '_HDC_') + window.location.pathname
     var $localStorage = window.localStorage || {
       getItem: function () {
         return null
       },
-      setItem: function () {
-      },
-      clear: function () {
-
-      }
+      setItem: function () {},
+      clear: function () {}
     }
-    function get (key) {
+    function get(key) {
       if (window._hdc_need_fecth_new_) return null
       var value = $localStorage.getItem(prefix + key)
       try {
@@ -57,14 +54,14 @@
         return value
       }
     }
-    function set (key, value) {
+    function set(key, value) {
       try {
         $localStorage.setItem(prefix + key, JSON.stringify(value))
       } catch (e) {
         $localStorage.setItem(prefix + key, value)
       }
     }
-    function clear () {
+    function clear() {
       var i = $localStorage.length - 1
       while (i >= 0) {
         if (localStorage.key(i) && ~$localStorage.key(i).indexOf(prefix)) {
@@ -73,38 +70,41 @@
         --i
       }
     }
-    function rm (key, ori) {
-      $localStorage.removeItem(!!ori ? key : (prefix + key))
+    function rm(key, ori) {
+      $localStorage.removeItem(!!ori ? key : prefix + key)
     }
     return {
-      get: get, set: set, clear: clear, rm: rm
+      get: get,
+      set: set,
+      clear: clear,
+      rm: rm
     }
   }
   // XHR
-  function createXHR () {
-    if (typeof XMLHttpRequest != "undefined") {
-      return new XMLHttpRequest();
-    } else if (typeof ActiveXObject != "undefined") {
-      if (typeof arguments.callee.activeXString != "string") {
-        var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0", "MSXML2.XMLHttp"];
+  function createXHR() {
+    if (typeof XMLHttpRequest != 'undefined') {
+      return new XMLHttpRequest()
+    } else if (typeof ActiveXObject != 'undefined') {
+      if (typeof arguments.callee.activeXString != 'string') {
+        var versions = ['MSXML2.XMLHttp.6.0', 'MSXML2.XMLHttp.3.0', 'MSXML2.XMLHttp']
         for (var i = 0, len = versions.length; i < len; i++) {
           try {
-            var xhr = new ActiveXObject(versions[i]);
-            arguments.callee.activeXString = versions[i];
-            return xhr;
+            var xhr = new ActiveXObject(versions[i])
+            arguments.callee.activeXString = versions[i]
+            return xhr
           } catch (e) {
             //跳过
           }
         }
       }
-      return new ActiveXObject(arguments.callee.activeXString);
+      return new ActiveXObject(arguments.callee.activeXString)
     } else {
-      throw new Error("No XHR object available")
+      throw new Error('No XHR object available')
     }
   }
   var $storage = getStorage()
-  function loadFn (obj, version, callback, isPrefetch) {
-    callback = callback || function () { }
+  function loadFn(obj, version, callback, isPrefetch) {
+    callback = callback || function () {}
     var jsArr = []
     if (typeof obj === 'string') {
       if (obj !== 'replaceTem') {
@@ -129,21 +129,20 @@
               console.log('load  success.' + jsArr[j].url)
             }
           })(i),
-          version, isPrefetch
+          version,
+          isPrefetch
         )
       }
     }
     __gorunJs(newJSarray, 0, version, callback, isPrefetch)
   }
-  function __gorunJs (newJSarray, i, version, callback, isPrefetch) {
+  function __gorunJs(newJSarray, i, version, callback, isPrefetch) {
     // 修改 避免依赖项存在
     _run(
       newJSarray[i],
       function (jsObj) {
         if (jsObj.skip) {
-          console.log(
-            '跳过 加载' + ['', 'esModule', 'noModule'][jsObj.moduleType]
-          )
+          console.log('跳过 加载' + ['', 'esModule', 'noModule'][jsObj.moduleType])
         }
         callback.loadItem = callback.loadItem || { error: 0, success: 0, items: [] }
         if (jsObj.e) {
@@ -163,7 +162,7 @@
       isPrefetch
     )
   }
-  function _run (obj, callback, version, isPrefetch) {
+  function _run(obj, callback, version, isPrefetch) {
     if (isPrefetch) {
       _prefetch(obj, callback, version)
     } else {
@@ -174,7 +173,7 @@
       }
     }
   }
-  function _prefetch (obj, callback, version) {
+  function _prefetch(obj, callback, version) {
     if (
       (!window.__browserHasNotModules && obj.moduleType === 2) ||
       (window.__browserHasNotModules && obj.moduleType === 1)
@@ -189,15 +188,15 @@
     obj.position = 'head'
     putToHtml(obj, link, callback)
   }
-  function loadStyle (cssObj, callback, version, isPrefetch) {
+  function loadStyle(cssObj, callback, version, isPrefetch) {
     var done = false
     var style = document.createElement('link')
     style.setAttribute('rel', 'stylesheet')
     style.setAttribute('type', 'text/css')
-    style.setAttribute('href', cssObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version)))
+    style.setAttribute('href', cssObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : '?HDC=' + version))
     putToHtml(cssObj, style, callback)
   }
-  function laodScript (jsObj, callback, version) {
+  function laodScript(jsObj, callback, version) {
     if (
       (!window.__browserHasNotModules && jsObj.moduleType === 2) ||
       (window.__browserHasNotModules && jsObj.moduleType === 1)
@@ -210,7 +209,7 @@
     script.type = 'text/javascript'
     script.language = 'javascript'
     script.charset = 'utf-8'
-    script.src = jsObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version))
+    script.src = jsObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : '?HDC=' + version)
     switch (jsObj.moduleType) {
       case 1:
         script.type = 'module'
@@ -225,15 +224,10 @@
 
     putToHtml(jsObj, script, callback)
   }
-  function putToHtml (obj, loadItem, callback) {
+  function putToHtml(obj, loadItem, callback) {
     var done = false
     loadItem.onload = loadItem.onreadystatechange = function () {
-      if (
-        !done &&
-        (!loadItem.readyState ||
-          loadItem.readyState == 'loaded' ||
-          loadItem.readyState == 'complete')
-      ) {
+      if (!done && (!loadItem.readyState || loadItem.readyState == 'loaded' || loadItem.readyState == 'complete')) {
         done = true
         loadItem.onload = loadItem.onreadystatechange = null
         if (callback) {
@@ -256,9 +250,9 @@
     }
   }
   // 通过xhr 去获取文件信息
-  function getHDCJS (url, isAsync, ori) {
+  function getHDCJS(url, isAsync, ori) {
     var xhr = createXHR()
-    xhr.open('get', ori ? url + '?HDC=' + Math.random() : url, !!isAsync)
+    xhr.open('get', url + '?HDC=' + Math.random(), !!isAsync)
     xhr.onload = function (e) {
       //同步接受响应
       if (xhr.readyState == 4) {
@@ -267,13 +261,17 @@
           //实际操作
           // console.log(xhr.responseText)
           if (ori) {
+            // 有更新 更新缓存文件
             if (xhr.responseText !== ori) {
               if (checkIsSuccess(xhr.responseText)) {
                 $storage.set(url, xhr.responseText)
                 $storage.set(url + '_expire', expire)
                 HDCCONF.isOld = true
                 var splitStr = xhr.responseText.split('],')
-                splitStr[1] = splitStr[1].replace(')', ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
+                splitStr[1] = splitStr[1].replace(
+                  ')',
+                  ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)'
+                )
                 insetJs(splitStr.join('],'))
               }
             } else {
@@ -281,26 +279,35 @@
               HDCCONF.checkUpdateCall(HDCCONF.isOld)
             }
           } else {
+            // 如果没有缓存 直接执行
             if (checkIsSuccess(xhr.responseText)) {
               $storage.set(url, xhr.responseText)
               $storage.set(url + '_expire', expire)
-              insetJs(xhr.responseText)
+              var splitStr = xhr.responseText.split('],')
+              // 需要处理加载错误的错误情况 有错误就显示错误
+              splitStr[1] = splitStr[1].replace(
+                ')',
+                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();if(window.HDCENTRYFILELOADERRORINFO){document.querySelector(window.HDCRENDERERRORINFOELEMENT).innerHTML=window.HDCENTRYFILELOADERRORINFO}}})'
+              )
+              insetJs(splitStr.join('],'))
             } else {
+              // 测试文件获取有问题
+              //
             }
           }
         }
       }
     }
-    xhr.send(null);
+    xhr.send(null)
   }
-  function insetJs (jsCode) {
+  function insetJs(jsCode) {
     var script = document.createElement('script')
     script.type = 'text/javascript'
-    script.innerHTML = jsCode;
+    script.innerHTML = jsCode
     document.body.appendChild(script)
   }
   // 获取时间戳
-  function getTimes (timeStr) {
+  function getTimes(timeStr) {
     var flag = timeStr.substr(0, 1)
     var day = timeStr.substr(1) || 2
     var ObjConfig = {
@@ -312,35 +319,46 @@
     return (ObjConfig[flag] || 7) * day * 60 * 60 * 24 * 1000 + Date.now()
   }
   // 加载hdc配置文件
-  function loadHdDCCONF (url) {
+  function loadHdDCCONF(url) {
     // 先获取缓存
     var hdcConfCode = $storage.get(url)
     var hdcConfCodeExpire = $storage.get(url + '_expire')
     // 去处理被劫持的情况
     if (hdcConfCodeExpire && hdcConfCodeExpire >= Date.now() && hdcConfCode && checkIsSuccess(hdcConfCode)) {
-      setTimeout(function () {
-        // 处理现在过时的问题
-        try {
-          var splitStr = hdcConfCode.split('],')
-          splitStr[1] = splitStr[1].replace(')', ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})')
-          insetJs(splitStr.join('],'))
+      // setTimeout(function () {
+      // 处理现在过时的问题
+      try {
+        var splitStr = hdcConfCode.split('],')
+        splitStr[1] = splitStr[1].replace(
+          ')',
+          ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})'
+        )
+        insetJs(splitStr.join('],'))
+        if (HDCCONF.checkUpdateDelay) {
+          getHDCJS(url, true, hdcConfCode)
+        } else {
           setTimeout(function () {
-            getHDCJS(url, true, hdcConfCode);
-          }, 1000)
-        } catch (e) {
-          getHDCJS(url, true);
+            // 获取是否版本过时
+            getHDCJS(url, true, hdcConfCode)
+          }, HDCCONF.checkUpdateDelay)
         }
-      }, 0)
+      } catch (e) {
+        getHDCJS(url, true)
+      }
+      // }, 0)
     } else {
-      getHDCJS(url, true);
+      getHDCJS(url, true)
     }
   }
-  function checkIsSuccess (hdcConfCode) {
-    return (hdcConfCode.indexOf('__hdc__loadFn') > -1 || hdcConfCode.indexOf('__loadFn') > -1) && hdcConfCode.indexOf('position') > -1
+  function checkIsSuccess(hdcConfCode) {
+    return (
+      (hdcConfCode.indexOf('__hdc__loadFn') > -1 || hdcConfCode.indexOf('__loadFn') > -1) &&
+      hdcConfCode.indexOf('position') > -1
+    )
   }
-  window.__hdc__version = "__hdc__version__";
-  window.__hdc__loadFn = loadFn;
-  window.__loadFn = loadFn;
+  window.__hdc__version = '__hdc__version__'
+  window.__hdc__loadFn = loadFn
+  window.__loadFn = loadFn
   window.__hdc__clearCache = function (cb) {
     $storage.clear()
   }

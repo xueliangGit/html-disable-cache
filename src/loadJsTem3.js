@@ -1,20 +1,17 @@
-
 // 只是储存配置文件，不储存文件源码；使用src加载
-; (function () {
-  function indexedDBFactory (config) {
+;(function () {
+  function indexedDBFactory(config) {
     //  兼容ios10 的safari
-    function getStorage (prefix) {
+    function getStorage(prefix) {
       prefix = (prefix || '_HDC_') + window.location.pathname
       var $localStorage = window.localStorage || {
         getItem: function () {
           return null
         },
-        setItem: function () {
-        },
-        clear: function () {
-        }
+        setItem: function () {},
+        clear: function () {}
       }
-      function get (key, cb) {
+      function get(key, cb) {
         var value = $localStorage.getItem(prefix + key)
         try {
           var Obj = JSON.parse(value)
@@ -25,14 +22,14 @@
           return value
         }
       }
-      function set (key, value) {
+      function set(key, value) {
         try {
           $localStorage.setItem(prefix + key, JSON.stringify(value))
         } catch (e) {
           $localStorage.setItem(prefix + key, value)
         }
       }
-      function clear () {
+      function clear() {
         var i = $localStorage.length - 1
         while (i >= 0) {
           if (localStorage.key(i) && ~$localStorage.key(i).indexOf(prefix)) {
@@ -41,12 +38,12 @@
           --i
         }
       }
-      function rm (key, cb, ori) {
-        $localStorage.removeItem(!!ori ? key : (prefix + key))
+      function rm(key, cb, ori) {
+        $localStorage.removeItem(!!ori ? key : prefix + key)
         cb && cb(null)
       }
       return {
-        createTable: function () { },
+        createTable: function () {},
         read: get,
         remove: rm,
         add: set,
@@ -70,29 +67,31 @@
       table: '',
       version: null
     }
-    function log (str) {
+    function log(str) {
       console.log('indexedDB:', str)
     }
     // 初始化数据库
-    function initDb (cb) {
+    function initDb(cb) {
       try {
-        var openRequest = dbConfig.version ? window.indexedDB.open(dbConfig.name, dbConfig.version) : window.indexedDB.open(dbConfig.name);
+        var openRequest = dbConfig.version
+          ? window.indexedDB.open(dbConfig.name, dbConfig.version)
+          : window.indexedDB.open(dbConfig.name)
         var db = null
         openRequest.onupgradeneeded = function (event) {
-          log("Upgrading...");//  要更新数据表，schema 时 触发；
+          log('Upgrading...') //  要更新数据表，schema 时 触发；
           cb(event.target.result, function () {
             event.target.result.close()
           })
         }
         openRequest.onsuccess = function (event) {
-          log("Success!");
+          log('Success!')
           cb(event.target.result, function () {
             event.target.result.close()
           })
         }
         openRequest.onerror = function (e) {
-          log("Error");
-          console.dir(e);
+          log('Error')
+          console.dir(e)
         }
       } catch (e) {
         cb(null)
@@ -102,21 +101,20 @@
     pathArray.pop()
     var locationPath = pathArray.join('/')
 
-    function setUrl (params) {
+    function setUrl(params) {
       if (params == null) {
         return params
       }
       var typeofStr = typeof params
       if (typeofStr === 'string') {
-        return params.indexOf('http') > -1
-          ? params
-          : '_HDC_' + locationPath + '/' + params
+        return params.indexOf('http') > -1 ? params : '_HDC_' + locationPath + '/' + params
       } else if (typeofStr === 'object') {
         params.url = setUrl(params.url)
         return params
       }
     }
-    function createTable (name, params, cb) { // array
+    function createTable(name, params, cb) {
+      // array
       if (!window.indexedDB) {
         cb && cb(true)
         return
@@ -129,10 +127,13 @@
           return
         }
         if (!db.objectStoreNames.contains(name)) {
-          objectStore = db.createObjectStore(name, params.keyPath ? { keyPath: params.keyPath } : { autoIncrement: true });
+          objectStore = db.createObjectStore(
+            name,
+            params.keyPath ? { keyPath: params.keyPath } : { autoIncrement: true }
+          )
           if (params.shema) {
             for (var i = 0; i < params.shema.length; i++) {
-              objectStore.createIndex(params.shema[i].name, params.shema[i].name, { unique: !!params.shema[i].unique });
+              objectStore.createIndex(params.shema[i].name, params.shema[i].name, { unique: !!params.shema[i].unique })
             }
           }
         }
@@ -142,7 +143,7 @@
       })
     }
     // 添加
-    function add (params, cb) {
+    function add(params, cb) {
       params = setUrl(params)
       if (!window.indexedDB) {
         $storage.set(params.url, params.code)
@@ -155,15 +156,13 @@
           cb && cb(true)
           return
         }
-        var request = db.transaction([dbConfig.table], 'readwrite')
-          .objectStore(dbConfig.table)
-          .add(params);
+        var request = db.transaction([dbConfig.table], 'readwrite').objectStore(dbConfig.table).add(params)
 
         request.onsuccess = function (event) {
           log(params.url + 'WS')
           close()
           cb && cb()
-        };
+        }
 
         request.onerror = function (event) {
           log(params.url + 'WE')
@@ -173,7 +172,7 @@
       })
     }
     //读取
-    function read (params, cb) {
+    function read(params, cb) {
       if (window._hdc_need_fecth_new_) {
         cb(true)
         return
@@ -190,22 +189,20 @@
           cb && cb(true)
           return
         }
-        var request = db.transaction([dbConfig.table])
-          .objectStore(dbConfig.table)
-          .get(params)
+        var request = db.transaction([dbConfig.table]).objectStore(dbConfig.table).get(params)
         request.onerror = function (event) {
           cb && cb(event)
-        };
+        }
 
         request.onsuccess = function (event) {
           log(params + 'RS')
           close()
           cb(!request.result || null, request.result)
-        };
+        }
       })
     }
     // 更新
-    function update (params, cb) {
+    function update(params, cb) {
       params = setUrl(params)
       if (!window.indexedDB) {
         $storage.set(params.url, params.code)
@@ -218,14 +215,12 @@
           cb && cb(true)
           return
         }
-        var request = db.transaction([dbConfig.table], 'readwrite')
-          .objectStore(dbConfig.table)
-          .put(params);
+        var request = db.transaction([dbConfig.table], 'readwrite').objectStore(dbConfig.table).put(params)
         request.onsuccess = function (event) {
           log(params.url + 'US')
           close()
           cb && cb()
-        };
+        }
         request.onerror = function (event) {
           log(params.url + 'UE')
           close()
@@ -233,7 +228,7 @@
         }
       })
     }
-    function remove (url, cb) {
+    function remove(url, cb) {
       url = setUrl(url)
       if (!window.indexedDB) {
         $storage.rm(url)
@@ -246,27 +241,23 @@
           cb && cb(true)
           return
         }
-        var request = db.transaction([dbConfig.table], 'readwrite')
-          .objectStore(dbConfig.table)
-          .delete(url);
+        var request = db.transaction([dbConfig.table], 'readwrite').objectStore(dbConfig.table).delete(url)
 
         request.onsuccess = function (event) {
           log(url + 'RMS')
           close()
           cb && cb()
-        };
+        }
       })
     }
-    function clear (cb, all) {
+    function clear(cb, all) {
       initDb(function (db, close) {
         if (!db) {
           cb && cb(true)
           return
         }
         var _suffix = setUrl('')
-        var tables = db
-          .transaction([dbConfig.table], 'readwrite')
-          .objectStore(dbConfig.table)
+        var tables = db.transaction([dbConfig.table], 'readwrite').objectStore(dbConfig.table)
         var request = tables.openCursor()
         var result = []
         request.onsuccess = function (event) {
@@ -280,7 +271,7 @@
             // 如果全部遍历完毕...
             // console.log(_suffix)
             for (var i = 0; i < result.length; i++) {
-              if (all || result[i] && result[i].url.indexOf(_suffix) > -1) {
+              if (all || (result[i] && result[i].url.indexOf(_suffix) > -1)) {
                 tables.delete(result[i].url)
               }
             }
@@ -294,7 +285,7 @@
         }
       })
     }
-    function indexDbApi () {
+    function indexDbApi() {
       dbConfig.name = (config || {})['name'] || dbConfig.name
       dbConfig.table = (config || {})['table'] || dbConfig.table
       return {
@@ -328,48 +319,48 @@
       }
     }
     return {}
-  })();
+  })()
   var HDCCONF = {
     startTime: Date.now(),
-    loadModeIsSave: window.HDCISONLYLOAD !== undefined ? window.HDCISONLYLOAD : window.top !== window.self,// 在iframe 中 ，是加载缓存用的 false 直接往常加载
+    loadModeIsSave: window.HDCISONLYLOAD !== undefined ? window.HDCISONLYLOAD : window.top !== window.self, // 在iframe 中 ，是加载缓存用的 false 直接往常加载
     url: window.HDCCONFURL || elmConf.hdc,
     isOld: false,
-    loadType: window.HDCCONFLOADTYPE || (elmConf.loadType || 1),
+    loadType: window.HDCCONFLOADTYPE || elmConf.loadType || 1,
     expire: window.HDCCONFEXPIRE || elmConf.expire || 'w2',
-    checkUpdateCall: function () { }
+    checkUpdateCall: function () {},
+    checkUpdateDelay: window.HDCCHECKUPDATEDELAY || 1000
   }
   if (!HDCCONF.url) {
     console.error('未发现hdc配置信息，请按照要求设置')
     return
   }
   // XHR
-  function createXHR () {
-    if (typeof XMLHttpRequest != "undefined") {
-      return new XMLHttpRequest();
-    } else if (typeof ActiveXObject != "undefined") {
-      if (typeof arguments.callee.activeXString != "string") {
-        var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0", "MSXML2.XMLHttp"];
+  function createXHR() {
+    if (typeof XMLHttpRequest != 'undefined') {
+      return new XMLHttpRequest()
+    } else if (typeof ActiveXObject != 'undefined') {
+      if (typeof arguments.callee.activeXString != 'string') {
+        var versions = ['MSXML2.XMLHttp.6.0', 'MSXML2.XMLHttp.3.0', 'MSXML2.XMLHttp']
         for (var i = 0, len = versions.length; i < len; i++) {
           try {
-            var xhr = new ActiveXObject(versions[i]);
-            arguments.callee.activeXString = versions[i];
-            return xhr;
+            var xhr = new ActiveXObject(versions[i])
+            arguments.callee.activeXString = versions[i]
+            return xhr
           } catch (e) {
             //跳过
           }
         }
       }
-      return new ActiveXObject(arguments.callee.activeXString);
+      return new ActiveXObject(arguments.callee.activeXString)
     } else {
-      throw new Error("No XHR object available")
+      throw new Error('No XHR object available')
     }
   }
   var $storageDb = {}
   $storageDb = indexedDBFactory()
 
-
-  function loadFn (obj, version, callback, isPrefetch) {
-    callback = callback || function () { }
+  function loadFn(obj, version, callback, isPrefetch) {
+    callback = callback || function () {}
     var jsArr = []
     if (typeof obj === 'string') {
       if (obj !== 'replaceTem') {
@@ -394,21 +385,20 @@
               console.log('load  success.' + jsArr[j].url)
             }
           })(i),
-          version, isPrefetch
+          version,
+          isPrefetch
         )
       }
     }
     __gorunJs(newJSarray, 0, version, callback, isPrefetch)
   }
-  function __gorunJs (newJSarray, i, version, callback, isPrefetch) {
+  function __gorunJs(newJSarray, i, version, callback, isPrefetch) {
     // 修改 避免依赖项存在
     _run(
       newJSarray[i],
       function (jsObj) {
         if (jsObj.skip) {
-          console.log(
-            '跳过 加载' + ['', 'esModule', 'noModule'][jsObj.moduleType]
-          )
+          console.log('跳过 加载' + ['', 'esModule', 'noModule'][jsObj.moduleType])
         }
         callback.loadItem = callback.loadItem || { error: 0, success: 0, items: [] }
         if (jsObj.e) {
@@ -428,7 +418,7 @@
       isPrefetch
     )
   }
-  function _run (obj, callback, version, isPrefetch) {
+  function _run(obj, callback, version, isPrefetch) {
     if (isPrefetch) {
       _prefetch(obj, callback, version)
     } else {
@@ -439,8 +429,8 @@
       }
     }
   }
-  function _prefetch (obj, callback, version) {
-    var text = { 'js': 'script', 'css': 'style' }
+  function _prefetch(obj, callback, version) {
+    var text = { js: 'script', css: 'style' }
     if (
       (!window.__browserHasNotModules && obj.moduleType === 2) ||
       (window.__browserHasNotModules && obj.moduleType === 1)
@@ -452,20 +442,20 @@
     var link = document.createElement('link')
     // link.setAttribute('rel', 'prefetch')
     link.setAttribute('rel', 'preload')
-    link.setAttribute('href', obj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version)))
+    link.setAttribute('href', obj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : '?HDC=' + version))
     link.setAttribute('as', text[obj.type])
     obj.position = 'head'
     putToHtml(obj, link, callback)
   }
-  function loadStyle (cssObj, callback, version, isPrefetch) {
+  function loadStyle(cssObj, callback, version, isPrefetch) {
     var done = false
     var style = document.createElement('link')
     style.setAttribute('rel', 'stylesheet')
     style.setAttribute('type', 'text/css')
-    style.setAttribute('href', cssObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version)))
+    style.setAttribute('href', cssObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : '?HDC=' + version))
     putToHtml(cssObj, style, callback)
   }
-  function laodScript (jsObj, callback, version) {
+  function laodScript(jsObj, callback, version) {
     if (
       (!window.__browserHasNotModules && jsObj.moduleType === 2) ||
       (window.__browserHasNotModules && jsObj.moduleType === 1)
@@ -478,7 +468,7 @@
     script.type = 'text/javascript'
     script.language = 'javascript'
     script.charset = 'utf-8'
-    script.src = jsObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : ('?HDC=' + version))
+    script.src = jsObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : '?HDC=' + version)
     switch (jsObj.moduleType) {
       case 1:
         script.type = 'module'
@@ -493,15 +483,10 @@
 
     putToHtml(jsObj, script, callback)
   }
-  function putToHtml (obj, loadItem, callback) {
+  function putToHtml(obj, loadItem, callback) {
     var done = false
     loadItem.onload = loadItem.onreadystatechange = function () {
-      if (
-        !done &&
-        (!loadItem.readyState ||
-          loadItem.readyState == 'loaded' ||
-          loadItem.readyState == 'complete')
-      ) {
+      if (!done && (!loadItem.readyState || loadItem.readyState == 'loaded' || loadItem.readyState == 'complete')) {
         done = true
         loadItem.onload = loadItem.onreadystatechange = null
         if (callback) {
@@ -524,11 +509,11 @@
     }
   }
   // 通过xhr 去获取文件信息
-  function getHDCJS (url, isAsync, ori) {
+  function getHDCJS(url, isAsync, ori) {
     var xhr = createXHR()
     // 第一次加载时不要加HDC后缀，让他直接加载；
     // 在检测是否更新时需要，也就是ORI存在时，需要加HDC；
-    xhr.open('get', ori ? url + '?HDC=' + Math.random() : url, !!isAsync)
+    xhr.open('get', url + '?HDC=' + Math.random(), !!isAsync)
     xhr.onload = function (e) {
       //同步接受响应
       if (xhr.readyState == 4) {
@@ -539,11 +524,13 @@
           if (ori) {
             if (xhr.responseText !== ori) {
               if (checkIsSuccess(xhr.responseText)) {
-                $storageDb.update({ url: url, expire: expire, code: xhr.responseText }, function (err, res) {
-                })
+                $storageDb.update({ url: url, expire: expire, code: xhr.responseText }, function (err, res) {})
                 HDCCONF.isOld = true
                 var splitStr = xhr.responseText.split('],')
-                splitStr[1] = splitStr[1].replace(')', ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)')
+                splitStr[1] = splitStr[1].replace(
+                  ')',
+                  ',function(obj){if(window.__hdc__checkUpdate__callback){window.__hdc__checkUpdate__callback(true)}},true)'
+                )
                 insetCode(splitStr.join('],'), 'js')
               }
             } else {
@@ -559,20 +546,23 @@
                 $storageDb.add({ url: url, expire: expire, code: xhr.responseText })
               }
               // $storageDb.set(url, xhr.responseText)
-              insetCode(xhr.responseText, 'js')
+              var splitStr = xhr.responseText.split('],')
+              splitStr[1] = splitStr[1].replace(
+                ')',
+                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();if(window.HDCENTRYFILELOADERRORINFO){document.querySelector(window.HDCRENDERERRORINFOELEMENT).innerHTML=window.HDCENTRYFILELOADERRORINFO}}})'
+              )
+              insetCode(splitStr.join('],'), 'js')
             } else {
             }
           }
         }
       }
     }
-    xhr.onerror = function () {
-
-    }
-    xhr.send(null);
+    xhr.onerror = function () {}
+    xhr.send(null)
   }
   // 获取时间戳
-  function getTimes (timeStr) {
+  function getTimes(timeStr) {
     var flag = timeStr.substr(0, 1)
     var day = timeStr.substr(1) || 2
     var ObjConfig = {
@@ -583,8 +573,8 @@
     }
     return (ObjConfig[flag] || 7) * day * 60 * 60 * 24 * 1000 + Date.now()
   }
-  // xhr loadjs inject js 
-  function loadAndSave (url, version, isAsync, type, callback, obj) {
+  // xhr loadjs inject js
+  function loadAndSave(url, version, isAsync, type, callback, obj) {
     var xhr = createXHR()
     xhr.open('get', url + '?HDC=' + version, !!isAsync)
     xhr.onload = function (e) {
@@ -611,9 +601,9 @@
     xhr.onerror = function () {
       callback && callback({ e: new Error(url + '加载失败') })
     }
-    xhr.send(null);
+    xhr.send(null)
   }
-  function insetCode (code, type, obj) {
+  function insetCode(code, type, obj) {
     if (obj && obj.moduleType && obj.moduleType == 1) {
       // 暂时不做Module 的方式
       return
@@ -622,7 +612,7 @@
     if (type === 'js') {
       inset = document.createElement('script')
       inset.type = 'text/javascript'
-      inset.innerHTML = code;
+      inset.innerHTML = code
     } else {
       inset = document.createElement('style')
       inset.type = 'text/css'
@@ -645,47 +635,53 @@
     }
   }
   // 加载hdc配置文件
-  function loadHdDCCONF (url) {
+  function loadHdDCCONF(url) {
     // 先获取缓存
     $storageDb.read(url, function (err, res) {
       if (err) {
-        getHDCJS(url, true);
+        getHDCJS(url, true)
         return
       }
       // 判断是否过期
       if (!res.expire || res.expire < Date.now()) {
         // 过期
         window._HDCCONFIG_IS_EXPIRE = true
-        getHDCJS(url, true);
+        getHDCJS(url, true)
         return
       }
       var hdcConfCode = res.code
       // 去处理被劫持的情况
       if (hdcConfCode && checkIsSuccess(hdcConfCode)) {
-        setTimeout(function () {
-          // 处理现在过时的问题
-          try {
-            var splitStr = hdcConfCode.split('],')
-            splitStr[1] = splitStr[1].replace(')', ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})')
-            insetCode(splitStr.join('],'), 'js')
-            setTimeout(function () {
-              getHDCJS(url, true, hdcConfCode);
-            }, 3000)
-          } catch (e) {
-            getHDCJS(url, true);
-          }
-        }, 0)
+        // setTimeout(function () {
+        // 处理现在过时的问题
+        try {
+          var splitStr = hdcConfCode.split('],')
+          splitStr[1] = splitStr[1].replace(
+            ')',
+            ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.location.reload()}})'
+          )
+          insetCode(splitStr.join('],'), 'js')
+          setTimeout(function () {
+            getHDCJS(url, true, hdcConfCode)
+          }, HDCCONF.checkUpdateDelay)
+        } catch (e) {
+          getHDCJS(url, true)
+        }
+        // }, 0)
       } else {
-        getHDCJS(url, true);
+        getHDCJS(url, true)
       }
     })
   }
-  function checkIsSuccess (hdcConfCode) {
-    return (hdcConfCode.indexOf('__hdc__loadFn') > -1 || hdcConfCode.indexOf('__loadFn') > -1) && hdcConfCode.indexOf('position') > -1
+  function checkIsSuccess(hdcConfCode) {
+    return (
+      (hdcConfCode.indexOf('__hdc__loadFn') > -1 || hdcConfCode.indexOf('__loadFn') > -1) &&
+      hdcConfCode.indexOf('position') > -1
+    )
   }
-  window.__hdc__version = "__hdc__version__";
-  window.__hdc__loadFn = loadFn;
-  window.__loadFn = loadFn;
+  window.__hdc__version = '__hdc__version__'
+  window.__hdc__loadFn = loadFn
+  window.__loadFn = loadFn
   window.__hdc__clearCache = function (cb, all) {
     $storageDb.clear(cb, all)
   }
