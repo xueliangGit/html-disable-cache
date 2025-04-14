@@ -557,12 +557,24 @@
             }
           }
         } else {
-          showErrorInfo()
+          // 如果有缓存就不处理错误
+          // 这里需要处理错误信息
+          if (!ori) {
+            showErrorInfo()
+          } else {
+            window._hdc_checkError = true
+          }
         }
       }
     }
     xhr.onerror = function () {
-      showErrorInfo()
+      // 如果有缓存就不处理错误
+      // 这里需要处理错误信息
+      if (!ori) {
+        showErrorInfo()
+      } else {
+        window._hdc_checkError = true
+      }
     }
     xhr.send(null)
   }
