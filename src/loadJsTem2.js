@@ -287,16 +287,24 @@
               // 需要处理加载错误的错误情况 有错误就显示错误
               splitStr[1] = splitStr[1].replace(
                 ')',
-                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();if(window.HDCENTRYFILELOADERRORINFO){document.querySelector(window.HDCRENDERERRORINFOELEMENT).innerHTML=window.HDCENTRYFILELOADERRORINFO}}})'
+                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache(); window.__hdc__showErrorInfo();}})'
               )
               insetJs(splitStr.join('],'))
             } else {
               // 测试文件获取有问题
               //
+              showErrorInfo()
             }
           }
+        } else {
+          // 加载配置失败时
+          // 这里需要处理错误信息
+          showErrorInfo()
         }
       }
+    }
+    xhr.onerror = function () {
+      showErrorInfo()
     }
     xhr.send(null)
   }
@@ -356,12 +364,18 @@
       hdcConfCode.indexOf('position') > -1
     )
   }
+  function showErrorInfo() {
+    if (window.HDCENTRYFILELOADERRORINFO && window.HDCRENDERERRORINFOELEMENT) {
+      document.querySelector(window.HDCRENDERERRORINFOELEMENT).innerHTML = window.HDCENTRYFILELOADERRORINFO
+    }
+  }
   window.__hdc__version = '__hdc__version__'
   window.__hdc__loadFn = loadFn
   window.__loadFn = loadFn
   window.__hdc__clearCache = function (cb) {
     $storage.clear()
   }
+  window.__hdc__showErrorInfo = showErrorInfo
   window.__hdc__checkUpdate = function (cb) {
     if (typeof cb === 'function') {
       HDCCONF.checkUpdateCall = cb

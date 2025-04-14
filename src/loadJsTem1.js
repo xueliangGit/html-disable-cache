@@ -479,16 +479,21 @@
               var splitStr = xhr.responseText.split('],')
               splitStr[1] = splitStr[1].replace(
                 ')',
-                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();if(window.HDCENTRYFILELOADERRORINFO){document.querySelector(window.HDCRENDERERRORINFOELEMENT).innerHTML=window.HDCENTRYFILELOADERRORINFO}}})'
+                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.__hdc__showErrorInfo();}})'
               )
               insetCode(splitStr.join('],'), 'js')
             } else {
+              showErrorInfo()
             }
           }
+        } else {
+          showErrorInfo()
         }
       }
     }
-    xhr.onerror = function () {}
+    xhr.onerror = function () {
+      showErrorInfo()
+    }
     xhr.send(null)
   }
   // 获取时间戳
@@ -607,12 +612,18 @@
       hdcConfCode.indexOf('position') > -1
     )
   }
+  function showErrorInfo() {
+    if (window.HDCENTRYFILELOADERRORINFO && window.HDCRENDERERRORINFOELEMENT) {
+      document.querySelector(window.HDCRENDERERRORINFOELEMENT).innerHTML = window.HDCENTRYFILELOADERRORINFO
+    }
+  }
   window.__hdc__version = '__hdc__version__'
   window.__hdc__loadFn = loadFn
   window.__loadFn = loadFn
   window.__hdc__clearCache = function (cb, all) {
     $storageDb.clear(cb, all)
   }
+  window.__hdc__showErrorInfo = showErrorInfo
   window.__hdc__checkUpdate = function (cb) {
     if (typeof cb === 'function') {
       HDCCONF.checkUpdateCall = cb
