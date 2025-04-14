@@ -360,7 +360,7 @@
 
   function loadFn(obj, version, callback_, isPrefetch) {
     console.time('__hdc__load_data')
-    callback = function (items) {
+    var callback = function (items) {
       console.timeEnd('__hdc__load_data')
       if (HDCCONF.loadModeIsSave) {
         // 需要通知外部函数
@@ -379,7 +379,7 @@
     var newJSarray = []
     var resouceIsGetNum = 0
     var resouceCodeArray = []
-    callback.loadItem = callback.loadItem || { error: 0, success: 0, items: [] }
+    callback.loadItem = callback.loadItem || { error: 0, success: 0, errorList: [], items: [] }
     for (var i = 0; i < jsArr.length; i++) {
       if (typeof jsArr[i] === 'string') {
         var sufix = /\.[^\\.]+$/.exec(jsArr[i]) + ''
@@ -392,6 +392,7 @@
           return function (data) {
             if (data.e) {
               callback.loadItem.error++
+              callback.loadItem.errorList.push(data.src)
             } else {
               callback.loadItem.success++
             }
@@ -479,18 +480,18 @@
               var splitStr = xhr.responseText.split('],')
               splitStr[1] = splitStr[1].replace(
                 ')',
-                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.__hdc__showErrorInfo();}})'
+                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.__hdc__showErrorInfo("加载入口文件失败",loadItem);}})'
               )
               insetCode(splitStr.join('],'), 'js')
             } else {
-              showErrorInfo()
+              showErrorInfo('版本文件' + url + '不符合要求，有可能被篡改')
             }
           }
         } else {
           // 如果有缓存就不处理错误
           // 这里需要处理错误信息
           if (!ori) {
-            showErrorInfo()
+            showErrorInfo('加载文件' + url + '失败')
           } else {
             window._hdc_checkError = true
           }
@@ -501,7 +502,7 @@
       // 如果有缓存就不处理错误
       // 这里需要处理错误信息
       if (!ori) {
-        showErrorInfo()
+        showErrorInfo('加载文件' + url + '失败')
       } else {
         window._hdc_checkError = true
       }
@@ -624,9 +625,16 @@
       hdcConfCode.indexOf('position') > -1
     )
   }
-  function showErrorInfo() {
+  function showErrorInfo(msg, data) {
     if (window.HDCENTRYFILELOADERRORINFO && window.HDCRENDERERRORINFOELEMENT) {
       document.querySelector(window.HDCRENDERERRORINFOELEMENT).innerHTML = window.HDCENTRYFILELOADERRORINFO
+    }
+    if (window.HDCENTRYFILELOADERRORCALLSCRIPT) {
+      window._hdc_LoadErrorInfo = {
+        msg: msg,
+        data: data
+      }
+      insetJs(window.HDCENTRYFILELOADERRORCALLSCRIPT)
     }
   }
   window.__hdc__version = '__hdc__version__'

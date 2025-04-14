@@ -144,8 +144,9 @@
         if (jsObj.skip) {
           console.log('跳过 加载' + ['', 'esModule', 'noModule'][jsObj.moduleType])
         }
-        callback.loadItem = callback.loadItem || { error: 0, success: 0, items: [] }
+        callback.loadItem = callback.loadItem || { error: 0, errorList: [], success: 0, items: [] }
         if (jsObj.e) {
+          callback.loadItem.errorList.push(jsObj.src)
           callback.loadItem.error++
         } else {
           callback.loadItem.success++
@@ -167,7 +168,7 @@
       _prefetch(obj, callback, version)
     } else {
       if (obj.type === 'js') {
-        laodScript(obj, callback, version)
+        loadScript(obj, callback, version)
       } else if (obj.type === 'css') {
         loadStyle(obj, callback, version)
       }
@@ -196,7 +197,7 @@
     style.setAttribute('href', cssObj.url + (HDCCONF.loadType == 1 && version === 10001 ? '' : '?HDC=' + version))
     putToHtml(cssObj, style, callback)
   }
-  function laodScript(jsObj, callback, version) {
+  function loadScript(jsObj, callback, version) {
     if (
       (!window.__browserHasNotModules && jsObj.moduleType === 2) ||
       (window.__browserHasNotModules && jsObj.moduleType === 1)
@@ -287,20 +288,20 @@
               // 需要处理加载错误的错误情况 有错误就显示错误
               splitStr[1] = splitStr[1].replace(
                 ')',
-                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache(); window.__hdc__showErrorInfo();}})'
+                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache(); window.__hdc__showErrorInfo("加载入口文件失败",loadItem);}})'
               )
               insetJs(splitStr.join('],'))
             } else {
               // 测试文件获取有问题
               //
-              showErrorInfo()
+              showErrorInfo('版本文件' + url + '不符合要求，有可能被篡改')
             }
           }
         } else {
           // 如果有缓存就不处理错误
           // 这里需要处理错误信息
           if (!ori) {
-            showErrorInfo()
+            showErrorInfo('加载文件' + url + '失败')
           } else {
             window._hdc_checkError = true
           }
@@ -309,7 +310,7 @@
     }
     xhr.onerror = function () {
       if (!ori) {
-        showErrorInfo()
+        showErrorInfo('加载文件' + url + '失败')
       } else {
         window._hdc_checkError = true
       }
@@ -372,9 +373,16 @@
       hdcConfCode.indexOf('position') > -1
     )
   }
-  function showErrorInfo() {
+  function showErrorInfo(msg, data) {
     if (window.HDCENTRYFILELOADERRORINFO && window.HDCRENDERERRORINFOELEMENT) {
       document.querySelector(window.HDCRENDERERRORINFOELEMENT).innerHTML = window.HDCENTRYFILELOADERRORINFO
+    }
+    if (window.HDCENTRYFILELOADERRORCALLSCRIPT) {
+      window._hdc_LoadErrorInfo = {
+        msg: msg,
+        data: data
+      }
+      insetJs(window.HDCENTRYFILELOADERRORCALLSCRIPT)
     }
   }
   window.__hdc__version = '__hdc__version__'

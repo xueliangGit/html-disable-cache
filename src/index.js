@@ -6,8 +6,8 @@ const cheerio = require('cheerio')
 const chalk = require('chalk')
 var minify = require('html-minifier').minify
 const { version } = require('../package.json')
+var UglifyJS = require('uglify-js')
 const { time } = require('console')
-
 // let this.conf.distPath =''// 项目目录  path.join(__dirname,'../../build')
 var conf = {
   show: false,
@@ -52,6 +52,7 @@ function HDC(distResolvePath, config = {}) {
     loadModeIsSave: null,
     checkUpdateDelay: 1000, // 延迟检测更新的时间默认1s
     entryFileLoadErrorInfo: null,
+    entryFileLoadErrorCallScript: null,
     renderErrorInfoElement: 'body' //显示错误信息的dom元素
   }
   if (typeof distResolvePath === 'string') {
@@ -83,6 +84,11 @@ function HDC(distResolvePath, config = {}) {
       ?.replace(/'/g, "\\'")
       .replace(/\n/g, '')}';window.HDCRENDERERRORINFOELEMENT='${this.conf.renderErrorInfoElement}';`
   }
+  if (this.conf.entryFileLoadErrorCallScript) {
+    insertStr += `window.HDCENTRYFILELOADERRORCALLSCRIPT='${
+      UglifyJS.minify(this.conf.entryFileLoadErrorCallScript).code || this.conf.entryFileLoadErrorCallScript
+    }';`
+  }
   let useFileTypeArray = ['', 'loadJsTem1.js', 'loadJsTem2.js', 'loadJsTem3.js']
   jsStr = fs.readFileSync(path.resolve(__dirname, useFileTypeArray[this.conf.useFileType]), 'utf8')
   jsStr = jsStr.replace('__hdc__version__', version)
@@ -96,7 +102,7 @@ function HDC(distResolvePath, config = {}) {
     this.hdcsrc = this.conf.hdcUrl
   } else {
     this.conf.staticNum += 1
-    var UglifyJS = require('uglify-js')
+
     // console.log(insertStr)
     writJs.call(this, this.hdcsrc, UglifyJS.minify(insertStr + jsStr).code)
   }
@@ -326,7 +332,6 @@ ${v.type === 'style' ? '</style>' : v.type === 'script' ? '</script>' : ''}
   })
 }
 function writJs(jsPath, data) {
-  // console.log(jsPath)
   fs.exists(path.dirname(jsPath), exists => {
     if (exists) {
       _wJs.call(this, jsPath, data)

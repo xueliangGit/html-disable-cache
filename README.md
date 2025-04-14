@@ -129,6 +129,20 @@ node HDC.js
 
 更新
 
+> 0.7.3@HDC 2025-04-14
+>
+> 1. 增加配置信息`entryFileLoadErrorCallScript`当入口文件加载失败时显示的信息，这里只能是 js 字符串，可以执行 js 进行上报错误，错误信息在 window.\_hdc_LoadErrorInfo 里
+>
+> ```js
+> // 错误信息在这个对象里 window._hdc_LoadErrorInfo
+> window._hdc_LoadErrorInfo = {
+>   msg: msg,
+>   data: data
+> }
+> ```
+>
+> 2.  优化执行方式,错误信息在加载失败时显示时机
+
 > 0.7.0@HDC 2025-04-12
 >
 > 1. 增加配置信息`entryFileLoadErrorInfo`当入口文件加载失败时显示的信息，默认为 null，不显示；

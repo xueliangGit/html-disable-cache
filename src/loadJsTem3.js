@@ -400,9 +400,10 @@
         if (jsObj.skip) {
           console.log('跳过 加载' + ['', 'esModule', 'noModule'][jsObj.moduleType])
         }
-        callback.loadItem = callback.loadItem || { error: 0, success: 0, items: [] }
+        callback.loadItem = callback.loadItem || { error: 0, success: 0, errorList: [], items: [] }
         if (jsObj.e) {
           callback.loadItem.error++
+          callback.loadItem.errorList.push(jsObj.src)
         } else {
           callback.loadItem.success++
         }
@@ -549,18 +550,18 @@
               var splitStr = xhr.responseText.split('],')
               splitStr[1] = splitStr[1].replace(
                 ')',
-                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.__hdc__showErrorInfo();}})'
+                ',function(loadItem){if(loadItem.error>0){window.__hdc__clearCache();window.__hdc__showErrorInfo("加载入口文件失败",loadItem);}})'
               )
               insetCode(splitStr.join('],'), 'js')
             } else {
-              showErrorInfo()
+              showErrorInfo('版本文件' + url + '不符合要求，有可能被篡改')
             }
           }
         } else {
           // 如果有缓存就不处理错误
           // 这里需要处理错误信息
           if (!ori) {
-            showErrorInfo()
+            showErrorInfo('加载文件' + url + '失败')
           } else {
             window._hdc_checkError = true
           }
@@ -571,7 +572,7 @@
       // 如果有缓存就不处理错误
       // 这里需要处理错误信息
       if (!ori) {
-        showErrorInfo()
+        showErrorInfo('加载文件' + url + '失败')
       } else {
         window._hdc_checkError = true
       }
@@ -696,9 +697,16 @@
       hdcConfCode.indexOf('position') > -1
     )
   }
-  function showErrorInfo() {
+  function showErrorInfo(msg, data) {
     if (window.HDCENTRYFILELOADERRORINFO && window.HDCRENDERERRORINFOELEMENT) {
       document.querySelector(window.HDCRENDERERRORINFOELEMENT).innerHTML = window.HDCENTRYFILELOADERRORINFO
+    }
+    if (window.HDCENTRYFILELOADERRORCALLSCRIPT) {
+      window._hdc_LoadErrorInfo = {
+        msg: msg,
+        data: data
+      }
+      insetJs(window.HDCENTRYFILELOADERRORCALLSCRIPT)
     }
   }
   window.__hdc__version = '__hdc__version__'
